@@ -1,0 +1,738 @@
+@font-face {
+    font-family: 'Zolla';
+    src: url('assets/Zolla.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Zolla-Outline';
+    src: url('assets/ZollaOutlined.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    background-color: black;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.loader-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0a0a0a;
+}
+
+.logo-text {
+    font-family: 'Zolla', sans-serif;
+    font-size: 120px;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    display: flex;
+    gap: 10px;
+    animation: pop-in 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.49) 1s both;
+}
+
+/* NAVBAR */
+
+.navbar {
+
+    position: fixed;
+
+    top: 60px;
+    /* space from top */
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 85%;
+    max-width: 950px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 30px;
+
+    border-radius: 40px;
+
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(0, 255, 255, 0.4);
+
+    box-shadow:
+        0 0 10px rgba(0, 255, 255, 0.25),
+        0 0 20px rgba(255, 255, 0, 0.2);
+
+    z-index: 1000;
+
+    opacity: 0;
+    transform: translate(-50%, -40px);
+
+    transition: all 0.4s ease;
+}
+
+
+/* SHOW NAVBAR AFTER SCROLL */
+
+.navbar.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+/* LOGO */
+
+.logo {
+    font-family: 'Zolla', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+/* NAV LINKS */
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #e6e6e6;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #00ffff;
+    text-shadow: 0 0 8px #00ffff;
+}
+
+
+/* LOGIN BUTTON */
+
+.login-btn {
+
+    padding: 8px 18px;
+
+    border-radius: 20px;
+
+    border: 1px solid #00ffff;
+
+    background: transparent;
+
+    color: #00ffff;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+}
+
+.login-btn:hover {
+
+    background: #00ffff;
+    color: black;
+
+    box-shadow: 0 0 10px #00ffff;
+
+}
+
+
+.bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.code {
+    color: #00ffff;
+    text-shadow:
+        0 0 5px #fff,
+        0 0 10px #00ffff,
+        0 0 40px #00ffff,
+        0 0 80px #008080;
+}
+
+.arena {
+    color: #ccff00;
+    text-shadow:
+        0 0 5px #fff,
+        0 0 10px #ccff00,
+        0 0 40px #ccff00,
+        0 0 80px #88aa00;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes pop-in {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+        filter: brightness(0%);
+    }
+
+    50% {
+        transform: scale(1.1);
+        filter: brightness(200%);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(100%);
+    }
+}
+
+.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.body-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+
+}
+
+.img-content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+.img-content img {
+    height: 100vh;
+    width: auto;
+    display: block;
+}
+
+img {
+    max-width: 100%;
+}
+
+.mainlogo-text {
+    font-family: 'Zolla', sans-serif;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6.5vh;
+    color: white;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.navbar-arcade {
+    position: absolute;
+    top: 17%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+}
+
+.nav-links-arcade {
+    list-style: none;
+    display: flex;
+    gap: 70px;
+    font-size: 2.5vh;
+    white-space: nowrap;
+
+}
+
+.nav-links-arcade li a {
+    color: transparent;
+    text-decoration: none;
+    font-family: 'Zolla', sans-serif;
+    transition: color 0.3s ease;
+}
+
+.lottieSecond {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+@media (min-width: 564px) {
+
+    .lottieSecond {
+        font-size: 24px;
+
+    }
+
+}
+
+.Second-navbar {
+    position: absolute;
+    top: 87.5%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+    font-family: 'Zolla', sans-serif;
+}
+
+.Second-navbar ul {
+    list-style: none;
+    height: auto;
+    display: block;
+}
+
+.Second-navbar ul li {
+    margin-bottom: 10px;
+}
+
+.Second-navbar ul a {
+    color: whitesmoke;
+    text-decoration: none;
+    font-size: 2vh;
+
+
+}
+
+.main-content {
+    padding: 0 64px;
+    background-color: black;
+}
+
+.programdiff {
+
+    min-height: 100vh;
+    /* takes full screen height */
+
+    background: #000;
+
+    padding: 80px 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+
+}
+
+
+
+/* TITLE */
+
+.level2-title {
+    font-family: 'Zolla', sans-serif;
+    font-size: 60px;
+    margin-bottom: 50px;
+
+    color: #ffff00;
+
+    text-shadow:
+        0 0 10px #ffff00,
+        0 0 20px #00ffff;
+
+}
+
+
+/* SCROLL CONTAINER */
+
+.programdiff-scrollbar {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    /* hide scrollbar Firefox */
+}
+
+.programdiff-scrollbar::-webkit-scrollbar {
+    display: none;
+
+    /* hide scrollbar Chrome/Safari */
+}
+
+
+/* CARD */
+
+.card {
+
+    min-width: 260px;
+    flex-shrink: 0;
+    height: 250px;
+
+    background: rgba(0, 0, 0, 0.6);
+
+    border-radius: 15px;
+
+
+    color: white;
+
+    border: 1px solid rgba(0, 255, 255, 0.4);
+
+    box-shadow:
+        0 0 10px rgba(0, 255, 255, 0.3),
+        0 0 20px rgba(255, 255, 0, 0.15);
+
+    transition: 0.3s;
+    padding: 2rem;
+    margin-top: 2rem;
+
+
+}
+
+.card img {
+
+    width: 100%;
+    /* full width of card */
+
+    height: 120px;
+    /* fixed height */
+
+    object-fit: cover;
+    /* crop image properly */
+
+    border-radius: 10px;
+
+    display: block;
+
+}
+
+
+/* CARD TITLE */
+
+.card h2 {
+    color: #00ffff;
+}
+
+
+.card:hover {
+
+    transform: translateY(-8px) scale(1.05);
+
+    box-shadow:
+        0 0 20px #00ffff,
+        0 0 35px #ffff00;
+
+}
+
+.games {
+
+    min-height: 100vh;
+    /* takes full screen height */
+
+    background: #000;
+
+    padding: 80px 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.level3-title{
+    font-family: 'zolla', sans-serif;
+    font-size: 32px;
+    color: #00ffff;
+    text-shadow:
+        0 0 10px #00ffff,
+        0 0 20px #00ffff;  
+   
+    
+}
+.level3-subtitle{
+    font-family: 'zolla', sans-serif;
+    font-size: 18px;
+    color: #ccff00;
+    text-shadow:
+        0 0 10px #ccff00,
+        0 0 20px #ccff00;  
+    margin-bottom: 40px;
+}
+.game-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+
+    gap:30px;
+
+    width:100%;
+
+    max-width:1200px;
+
+}
+.game-card{
+
+    background:rgba(0,0,0,0.6);
+
+    border-radius:15px;
+
+    padding:15px;
+
+    text-align:center;
+
+    border:1px solid rgba(0,255,255,0.4);
+
+    box-shadow:
+        0 0 10px rgba(0,255,255,0.3),
+        0 0 20px rgba(255,255,0,0.15);
+
+    transition:0.3s;
+
+}
+.game-card img{
+
+    width:100%;
+
+    height:180px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+    margin-bottom:10px;
+
+}
+.game-card h3{
+
+    color:#00ffff;
+
+    font-family:'zolla', sans-serif;
+
+}
+.game-card:hover{
+
+    transform:translateY(-8px) scale(1.03);
+
+    box-shadow:
+        0 0 20px #00ffff,
+        0 0 40px #ccff00;
+
+}
+.publish-game{
+
+    min-height:100vh;
+
+    background:#000;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    padding:80px 20px;
+
+}
+
+
+.publish-title{
+
+    font-family:'zolla', sans-serif;
+
+    font-size:42px;
+
+    color:#ffff00;
+
+    text-shadow:
+        0 0 10px #ffff00,
+        0 0 20px #00ffff;
+
+}
+
+
+.publish-text{
+
+    margin-top:20px;
+
+    max-width:600px;
+
+    color:#ddd;
+
+    font-size:18px;
+
+}
+
+
+.publish-btn{
+
+    margin-top:40px;
+
+    padding:15px 40px;
+
+    font-size:18px;
+
+    border-radius:30px;
+
+    border:2px solid #00ffff;
+
+    background:transparent;
+
+    color:#00ffff;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+}
+
+
+/* hover glow */
+
+.publish-btn:hover{
+
+    background:#00ffff;
+
+    color:black;
+
+    box-shadow:
+        0 0 15px #00ffff,
+        0 0 30px #ffff00;
+
+}
+.footer{
+
+    background:#000;
+
+    text-align:center;
+
+    padding:60px 20px;
+
+    border-top:1px solid rgba(0,255,255,0.3);
+
+}
+
+
+.footer-logo{
+
+    font-family:'zolla', sans-serif;
+
+    font-size:32px;
+
+    margin-bottom:10px;
+
+}
+
+
+.footer-tagline{
+
+    color:#ccc;
+
+    margin-bottom:30px;
+
+}
+
+
+.footer-links{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:30px;
+
+    margin-bottom:20px;
+
+}
+
+
+.footer-links a{
+
+    text-decoration:none;
+
+    color:#00ffff;
+
+    transition:0.3s;
+
+}
+
+
+.footer-links a:hover{
+
+    text-shadow:0 0 10px #00ffff;
+
+}
+
+
+.footer-social{
+
+    margin-bottom:20px;
+
+}
+
+
+.footer-social a{
+
+    margin:0 10px;
+
+    color:#ccff00;
+
+    text-decoration:none;
+
+}
+
+
+.footer-copy{
+
+    font-size:14px;
+
+    color:#888;
+
+}
