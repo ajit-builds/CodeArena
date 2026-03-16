@@ -7,240 +7,429 @@
     <title>About Ajit | Code Simplified</title>
     <script src="../auth-widget.js" defer></script>
     <script src="rocket-cursor.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* Define the true black theme palette */
-        :root {
-            --pure-black: #000000;
-            --bg-overlay: rgba(0, 0, 0, 0.7);
-            /* To make text readable over the video */
-            --card-bg: rgba(20, 20, 20, 0.8);
-            /* Slightly lighter dark for contrast */
-            --accent: #38bdf8;
-            /* Energetic blue */
-            --text-main: #f8fafc;
-            /* Near white */
-            --text-dim: #a1a1aa;
-            /* Muted gray */
-            --gradient: linear-gradient(135deg, #38bdf8 0%, #a78bfa 100%);
-            --border: #333333;
+        @font-face {
+            font-family: 'Zolla';
+            src: url('assets/Zolla.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
         }
 
-        * {
-            box-sizing: border-box;
+        /* ── PALETTE ── */
+        :root {
+            --black:      #000000;
+            --yellow:     #ffff00;
+            --yellow-dim: #cccc00;
+            --yellow-soft:#ffe566;
+            --cyan:       #00ffff;
+            --neon-green: #ccff00;
+            --card-bg:    rgba(18, 18, 0, 0.82);
+            --border:     rgba(255, 255, 0, 0.18);
+            --text-main:  #f8fafc;
+            --text-dim:   #b0b090;
+            --overlay:    rgba(0, 0, 0, 0.72);
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--pure-black);
-            /* Fallback color */
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background-color: var(--black);
             color: var(--text-main);
             line-height: 1.6;
-            margin: 0;
-            padding: 0;
             overflow-x: hidden;
         }
 
-        /* --- Video Background Styling --- */
+        /* ── VIDEO BG ── */
         .video-background {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            z-index: -2;
-            /* Puts video behind everything */
-            object-fit: cover;
-            /* Ensures video covers screen without stretching */
+            position: fixed; right: 0; bottom: 0;
+            min-width: 100%; min-height: 100%;
+            z-index: -2; object-fit: cover;
         }
-
-        /* Dark overlay to ensure readability */
         .video-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-overlay);
+            position: fixed; inset: 0;
+            background: var(--overlay);
             z-index: -1;
-            /* Between the video and the content */
         }
 
-        /* --- Main Content Area --- */
+        /* ── NAVBAR (matches index.html) ── */
+        .navbar {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-40px);
+            width: 85%;
+            max-width: 950px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 30px;
+            border-radius: 40px;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            box-shadow:
+                0 0 10px rgba(0, 255, 255, 0.25),
+                0 0 20px rgba(255, 255, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        .navbar.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .logo {
+            font-family: 'Zolla', 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .logo .code {
+            color: #00ffff;
+            text-shadow: 0 0 8px #00ffff, 0 0 20px #008080;
+        }
+        .logo .arena {
+            color: #ccff00;
+            text-shadow: 0 0 8px #ccff00, 0 0 20px #88aa00;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #e6e6e6;
+            transition: 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .nav-links a:hover {
+            color: #00ffff;
+            text-shadow: 0 0 8px #00ffff;
+        }
+        .login-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid #00ffff;
+            background: transparent;
+            color: #00ffff;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .login-btn:hover {
+            background: #00ffff;
+            color: black;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        /* ── Auth badge (profile link + logout) ── */
+        .ca-auth-row { display:flex;align-items:center;gap:6px;flex-wrap:nowrap; }
+        .ca-user-badge {
+            display:flex;align-items:center;gap:6px;
+            background:rgba(0,255,255,.07);border:1px solid rgba(0,255,255,.25);
+            border-radius:20px;padding:4px 10px 4px 6px;white-space:nowrap;text-decoration:none;
+            transition:background .2s;
+        }
+        .ca-user-badge:hover { background:rgba(0,255,255,.14); }
+        .ca-avatar {
+            width:26px;height:26px;border-radius:50%;flex-shrink:0;
+            background:linear-gradient(135deg,#00ffff,#ccff00);
+            display:flex;align-items:center;justify-content:center;
+            font-size:.68rem;font-weight:900;color:#000;
+        }
+        .ca-uname { font-size:.72rem;font-weight:700;color:#00ffff;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+        .ca-pchip { font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap; }
+        .ca-pchip.free    { background:rgba(0,255,255,.1);color:#00ffff; }
+        .ca-pchip.premium { background:rgba(204,255,0,.15);color:#ccff00; }
+        .ca-logout {
+            background:none;border:1px solid rgba(255,68,68,.35);color:rgba(255,68,68,.75);
+            padding:4px 10px;border-radius:16px;cursor:pointer;font-size:.68rem;
+            font-weight:700;text-transform:uppercase;letter-spacing:.04em;transition:all .2s;white-space:nowrap;
+        }
+        .ca-logout:hover { border-color:#ff4444;color:#ff4444;background:rgba(255,68,68,.07); }
+
+        /* ── CONTAINER ── */
         .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 6rem 2rem;
+            padding: 9rem 2rem 6rem;
             position: relative;
             z-index: 1;
-            /* Ensures content is on top */
         }
 
+        /* ── HEADER ── */
         header {
             text-align: center;
             margin-bottom: 5rem;
         }
-
+        .tagline {
+            font-size: 0.9rem;
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 12px var(--cyan);
+        }
         h1 {
-            font-size: 4rem;
-            margin: 0.5rem 0;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: 'Syne', 'Zolla', sans-serif;
+            font-size: 5.5rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: -1px;
+            letter-spacing: -2px;
+            color: var(--yellow);
+            text-shadow:
+                0 0 10px var(--yellow),
+                0 0 40px rgba(255,255,0,0.4),
+                0 0 80px rgba(255,255,0,0.15);
+            line-height: 1;
+            margin-bottom: 0.75rem;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+        .subtitle strong {
+            color: var(--yellow-soft);
         }
 
-        .tagline {
-            font-size: 1.2rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: 700;
+        /* ── DIVIDER ── */
+        .glow-line {
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+            margin: 2rem auto 0;
+            box-shadow: 0 0 10px var(--yellow);
         }
 
-        h2 {
-            font-size: 2.2rem;
-            margin-top: 0;
-            margin-bottom: 1.5rem;
-            color: var(--text-main);
-            font-weight: 700;
-            border-left: 5px solid var(--accent);
-            padding-left: 1rem;
-        }
-
-        /* --- Content Blocks --- */
+        /* ── CONTENT BLOCKS ── */
         .content-block {
             background: var(--card-bg);
             padding: 3rem;
-            border-radius: 1rem;
+            border-radius: 1.2rem;
             border: 1px solid var(--border);
-            margin-bottom: 4rem;
-            backdrop-filter: blur(5px);
-            /* Optional subtle blur effect */
+            margin-bottom: 3.5rem;
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .content-block::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 5px; height: 100%;
+            background: linear-gradient(180deg, var(--yellow), var(--yellow-dim));
+            box-shadow: 0 0 12px var(--yellow);
+            border-radius: 3px 0 0 3px;
+        }
+        .content-block:hover {
+            border-color: rgba(255,255,0,0.35);
+            box-shadow: 0 0 30px rgba(255,255,0,0.08), 0 0 60px rgba(0,255,255,0.04);
+        }
+
+        /* ── HEADINGS ── */
+        h2 {
+            font-family: 'Syne', 'Zolla', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--yellow);
+            text-shadow: 0 0 15px rgba(255,255,0,0.3);
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
         }
 
         p {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--text-dim);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
+            padding-left: 1.5rem;
         }
+        strong { color: var(--text-main); }
 
-        strong {
-            color: var(--text-main);
-        }
-
-        /* --- Tech Stack Table --- */
+        /* ── TECH STACK TABLE ── */
         .tech-stack-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
         }
-
         .tech-stack-table td {
-            padding: 1.2rem;
-            border-bottom: 1px solid var(--border);
-            font-size: 1.1rem;
+            padding: 1.1rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,0,0.1);
+            font-size: 1rem;
+            color: var(--text-main);
         }
-
+        .tech-stack-table tr:last-child td { border-bottom: none; }
+        .tech-stack-table tr:hover td { background: rgba(255,255,0,0.03); }
         .category-name {
+            font-family: 'Syne', sans-serif;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--cyan);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-            width: 30%;
+            letter-spacing: 2px;
+            font-size: 0.78rem;
+            width: 28%;
+            text-shadow: 0 0 6px rgba(0,255,255,0.4);
         }
 
-        /* --- WIP Section --- */
+        /* ── WIP ITEMS ── */
         .wip-item {
-            margin-bottom: 2.5rem;
-            padding-bottom: 1rem;
+            padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 2px solid rgba(255,255,0,0.25);
+            transition: border-color 0.3s;
         }
-
+        .wip-item:hover {
+            border-left-color: var(--yellow);
+        }
+        .wip-item:last-child { margin-bottom: 0; }
         .wip-item h3 {
-            color: var(--text-main);
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            font-family: 'Syne', 'Zolla', sans-serif;
+            color: var(--yellow-soft);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        .wip-item p { padding-left: 0; }
+
+        /* ── BADGE ── */
+        .wip-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: rgba(0,255,255,0.1);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-bottom: 0.6rem;
+            text-shadow: 0 0 6px var(--cyan);
         }
 
-        /* --- Footer --- */
-        .footer {
+        /* ── FOOTER ── */
+        .footer-section {
             text-align: center;
-            margin-top: 6rem;
+            margin-top: 5rem;
             padding-top: 3rem;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(255,255,0,0.15);
         }
-
         blockquote {
-            font-size: 1.4rem;
-            color: var(--text-main);
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            color: var(--yellow-soft);
             font-style: italic;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            text-shadow: 0 0 20px rgba(255,255,0,0.15);
         }
+        blockquote::before { content: '"'; color: var(--cyan); font-size: 2rem; line-height: 0; vertical-align: -0.4rem; }
+        blockquote::after  { content: '"'; color: var(--cyan); font-size: 2rem; line-height: 0; vertical-align: -0.4rem; }
 
         .btn {
             display: inline-block;
-            background: var(--gradient);
-            color: white;
-            padding: 1rem 2.5rem;
+            background: transparent;
+            color: var(--yellow);
+            border: 2px solid var(--yellow);
+            padding: 1rem 2.8rem;
             border-radius: 50px;
             text-decoration: none;
+            font-family: 'Syne', 'Zolla', sans-serif;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 15px rgba(255,255,0,0.15);
         }
-
         .btn:hover {
+            background: var(--yellow);
+            color: #000;
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 30px rgba(255,255,0,0.45), 0 0 60px rgba(255,255,0,0.2);
         }
 
-        /* Responsive Design */
+        .footer-cta-text {
+            margin-top: 3rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* ── SCROLL INDICATOR DOTS ── */
+        .dot-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 4rem;
+        }
+        .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,0,0.25);
+        }
+        .dot.active { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+
+        /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
-            .container {
-                padding: 3rem 1.5rem;
-            }
-
-            h1 {
-                font-size: 2.8rem;
-            }
-
-            h2 {
-                font-size: 1.8rem;
-            }
-
-            .content-block {
-                padding: 2rem;
-            }
+            .container { padding: 7rem 1.5rem 4rem; }
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 1.6rem; }
+            .content-block { padding: 2rem 1.5rem; }
+            .navbar { width: 92%; top: 16px; }
         }
     </style>
 </head>
 
 <body>
-    <div class="ca-auth-target"></div>
+    
 
-    <video autoplay loop muted playsinline class="video-background">
-        <source src="asteroid.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-
+  
     <div class="video-overlay"></div>
+
+    <!-- ── NAVBAR (matches index.html) ── -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo">
+            <span class="code">Code</span><span class="arena">Arena</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html#games">Games</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+            <li><a href="aboutme.html">About</a></li>
+        </ul>
+        <div class="auth" id="navAuth">
+            <!-- filled by JS -->
+        </div>
+    </nav>
 
     <div class="container">
         <header>
             <p class="tagline">Where Code Meets Creativity</p>
             <h1>Ajit</h1>
-            <p style="font-size: 1.3rem; color: var(--text-dim);">1st Year B.Tech CSE Student // Creator // Developer
-            </p>
+            <p class="subtitle"><strong>1st Year B.Tech CSE</strong> &nbsp;·&nbsp; Creator &nbsp;·&nbsp; Developer</p>
+            <div class="glow-line"></div>
         </header>
+
+        <div class="dot-row">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
 
         <section class="content-block">
             <h2>The Mission 🚀</h2>
-            <p>I’m on a journey to strip away the complexity of programming. The "stuffy" era of coding is over. My
+            <p>I'm on a journey to strip away the complexity of programming. The "stuffy" era of coding is over. My
                 goal? <strong>Break it down. Build it up. Make it stick.</strong> Whether it's through clean Django
                 backends or high-energy video edits, I'm here to make coding simpler for everyone.</p>
         </section>
@@ -250,15 +439,15 @@
             <table class="tech-stack-table">
                 <tr>
                     <td class="category-name">Languages</td>
-                    <td>Python // C++ // JavaScript</td>
+                    <td>Python &nbsp;//&nbsp; C++ &nbsp;//&nbsp; JavaScript</td>
                 </tr>
                 <tr>
                     <td class="category-name">Web Tech</td>
-                    <td>HTML5 // CSS3 // Django // Web Design</td>
+                    <td>HTML5 &nbsp;//&nbsp; CSS3 &nbsp;//&nbsp; Django &nbsp;//&nbsp; Web Design</td>
                 </tr>
                 <tr>
                     <td class="category-name">Creative</td>
-                    <td>Video Editing // Content Strategy // Visual Storytelling</td>
+                    <td>Video Editing &nbsp;//&nbsp; Content Strategy &nbsp;//&nbsp; Visual Storytelling</td>
                 </tr>
             </table>
         </section>
@@ -266,30 +455,71 @@
         <section class="content-block">
             <h2>Work In Progress 🚧</h2>
             <div class="wip-item">
+                <div class="wip-badge">Active</div>
                 <h3>Road to GSoC 2026</h3>
                 <p>Actively contributing to open-source repositories and mastering the workflow for large-scale
                     collaborative projects.</p>
             </div>
             <div class="wip-item">
+                <div class="wip-badge">In Progress</div>
                 <h3>The Creator's Lab</h3>
                 <p>Experimenting with fast-paced video edits for YouTube and Instagram to explain complex algorithms in
                     under 60 seconds.</p>
             </div>
             <div class="wip-item">
+                <div class="wip-badge">Building</div>
                 <h3>Simplifying the Web</h3>
                 <p>Building functional web applications (like my recent Zomato clone) to showcase clean, intuitive UI/UX
                     design.</p>
             </div>
         </section>
 
-        <div class="footer">
-            <blockquote>"If you can't explain it simply, you don't understand it well enough."</blockquote>
-            <br>
-            <a href="#" class="btn">View My Portfolio</a>
-            <p style="margin-top: 3rem; color: var(--text-dim); font-size: 0.9rem;">LET'S BUILD SOMETHING GREAT.</p>
+        <div class="footer-section">
+            <blockquote>If you can't explain it simply, you don't understand it well enough.</blockquote>
+            <a href="https://www.linkedin.com/in/ajit-singh-a47a47371/" class="btn">View My Portfolio</a>
+            <p class="footer-cta-text">Let's build something great.</p>
         </div>
     </div>
 
+    <script>
+        /* ── Navbar scroll reveal ── */
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('show', window.scrollY > 50);
+        });
+        setTimeout(() => navbar.classList.add('show'), 400);
+
+        /* ── Auth helpers ── */
+        const getUser   = () => { try { return JSON.parse(localStorage.getItem('codearena_user')); } catch { return null; } };
+        const clearUser = () => localStorage.removeItem('codearena_user');
+
+        function renderNavAuth() {
+            const nav  = document.getElementById('navAuth');
+            const user = getUser();
+            if (!user) {
+                nav.innerHTML = `<button class="login-btn" id="navLoginBtn">Login</button>`;
+                document.getElementById('navLoginBtn').onclick = () => window.location.href = 'index.html';
+            } else {
+                const initials = (user.name || user.email || 'U').slice(0, 2).toUpperCase();
+                const plan     = user.plan || 'free';
+                nav.innerHTML = `
+                    <div class="ca-auth-row">
+                        <a class="ca-user-badge" href="profile.html" title="View Profile">
+                            <div class="ca-avatar">${initials}</div>
+                            <span class="ca-uname">${user.name || user.email}</span>
+                            <span class="ca-pchip ${plan}">${plan}</span>
+                        </a>
+                        <button class="ca-logout" id="navLogoutBtn">Logout</button>
+                    </div>`;
+                document.getElementById('navLogoutBtn').onclick = () => {
+                    clearUser();
+                    renderNavAuth();
+                };
+            }
+        }
+
+        renderNavAuth();
+    </script>
 </body>
 
 </html>

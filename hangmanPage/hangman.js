@@ -303,8 +303,8 @@ function checkGameStatus() {
 // ── LOCALSTORAGE ──
 const LS_KEY = "codearena_hangman_scores";
 function saveScore(entry) {
-    const scores = loadScores();
-
+    let scores = [];
+    try { scores = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch {}
     const _u = (() => { try { return JSON.parse(localStorage.getItem('codearena_user')); } catch { return null; } })();
     scores.push({ ...entry, date: new Date().toLocaleDateString(), isoDate: new Date().toISOString(), player: _u?.name || _u?.email || 'Anonymous' });
     scores.sort((a, b) => b.score - a.score);

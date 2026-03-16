@@ -23,7 +23,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Zolla', "Open Sans", sans-serif;
 }
 
 :root {
@@ -158,6 +157,7 @@ body {
     gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
+    
 }
 
 .lang-btn {

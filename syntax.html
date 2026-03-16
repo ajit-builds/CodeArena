@@ -1229,8 +1229,8 @@
   <div class="status-bar" id="statusBar" style="display:none">
     <div class="status-pills">
       <span class="status-pill cyan" id="statusLang">JS</span>
-      <span class="status-pill" id="statusDiff">Easy · 45s</span>
-      <span class="status-pill muted" id="statusQ">Q 1/5</span>
+      <span class="status-pill" id="statusDiff" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Easy · 45s</span>
+      <span class="status-pill muted" id="statusQ"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Q 1/5</span>
     </div>
     <button class="change-btn" id="changeSetupBtn">⚙ Change Setup</button>
   </div>
@@ -1239,7 +1239,7 @@
      TIMER
 ══════════════════════════════════ -->
   <div class="timer-section">
-    <span class="timer-label">⏱ Time</span>
+    <span class="timer-label" >⏱ Time</span>
     <div class="timer-bar-wrap">
       <div class="timer-bar-fill" id="timerFill"></div>
     </div>
@@ -1283,8 +1283,8 @@
 
       <div class="level-bar-wrap">
         <div class="level-bar-header">
-          <span id="levelLabel">Level 1</span>
-          <span id="levelProgress">0 / 5</span>
+          <span id="levelLabel"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Level 1</span>
+          <span id="levelProgress"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0 / 5</span>
         </div>
         <div class="level-bar-track">
           <div class="level-bar-fill" id="levelFill" style="width:0%"></div>
@@ -1305,7 +1305,7 @@
 
         <!-- ── STEP 1: Language ── -->
         <div class="wizard-step active" id="step-lang">
-          <div class="wz-label">Step 1 of 2</div>
+          <div class="wz-label"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Step 1 of 2</div>
           <div class="wz-title">Choose a Language</div>
           <div class="wz-options">
             <button class="wz-btn" data-lang="javascript">
@@ -1334,23 +1334,23 @@
         <!-- ── STEP 2: Difficulty ── -->
         <div class="wizard-step" id="step-diff">
           <button class="wz-back" id="backToLang">← Back</button>
-          <div class="wz-label">Step 2 of 2</div>
+          <div class="wz-label"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Step 2 of 2</div>
           <div class="wz-title">Choose Difficulty</div>
           <div class="wz-options">
             <button class="wz-btn diff-easy" data-diff="easy">
               <span class="wz-icon">🟢</span>
               <span class="wz-name">Easy</span>
-              <span class="wz-sub">45 seconds per question</span>
+              <span class="wz-sub"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">45 seconds per question</span>
             </button>
             <button class="wz-btn diff-medium" data-diff="medium">
               <span class="wz-icon">🟡</span>
               <span class="wz-name">Medium</span>
-              <span class="wz-sub">30 seconds per question</span>
+              <span class="wz-sub"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">30 seconds per question</span>
             </button>
             <button class="wz-btn diff-hard" data-diff="hard">
               <span class="wz-icon">🔴</span>
               <span class="wz-name">Hard</span>
-              <span class="wz-sub">18 seconds · max points</span>
+              <span class="wz-sub"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">18 seconds · max points</span>
             </button>
           </div>
         </div>
@@ -1368,14 +1368,14 @@
     <div class="modal-box">
       <div class="modal-emoji" id="modalEmoji">🎉</div>
       <div class="modal-title win" id="modalTitle">Round Complete!</div>
-      <div class="modal-sub" id="modalSub">You answered all 5 questions.</div>
+      <div class="modal-sub" id="modalSub" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">You answered all 5 questions.</div>
 
       <div class="score-earned-block" id="scoreBlock">
-        <div class="se-row"><span>Correct Answers</span><span id="seCorrect">0 / 5</span></div>
-        <div class="se-row"><span>Avg. Time Bonus</span><span id="seTime">+0</span></div>
-        <div class="se-row"><span>Streak Bonus</span><span id="seStreak">+0</span></div>
+        <div class="se-row"><span>Correct Answers</span><span id="seCorrect" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0 / 5</span></div>
+        <div class="se-row"><span>Avg. Time Bonus</span><span id="seTime" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">+0</span></div>
+        <div class="se-row"><span>Streak Bonus</span><span id="seStreak" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">+0</span></div>
         <hr class="se-divider">
-        <div class="se-total" id="seTotal">0 pts</div>
+        <div class="se-total" id="seTotal" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0 pts</div>
       </div>
 
       <div class="modal-btn-row">
@@ -1392,7 +1392,7 @@
     <div class="modal-box">
       <div class="modal-emoji">⏰</div>
       <div class="modal-title timeout">Time's Up!</div>
-      <div class="modal-sub" id="timeoutSub">The answer was: <b id="correctAnswer" style="color:var(--cyan)"></b></div>
+      <div class="modal-sub" id="timeoutSub" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">The answer was: <b id="correctAnswer" style="color:var(--cyan)"></b></div>
       <div class="modal-btn-row">
         <button class="btn-primary" id="timeoutNextBtn">→ Next Question</button>
       </div>
@@ -1822,8 +1822,7 @@
         date: new Date().toLocaleDateString(),
         isoDate: new Date().toISOString(),
         game: 'syntax',
-        player: (()=>{ try{ return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; }catch{return 'Anonymous';} })()
-
+        player: (()=>{ try{ return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; }catch{ return 'Anonymous'; } })() 
       });
 
       // Populate modal

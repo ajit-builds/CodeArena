@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | CodeArena</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Open+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="rocket-cursor.js" defer></script>
+    <style>
+        @font-face {
+            font-family: 'Zolla';
+            src: url('assets/Zolla.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cyan: #00ffff;
+            --yellow: #ccff00;
+            --bg: #080808;
+            --surface: #111318;
+            --surface2: #161b24;
+            --border: rgba(0, 255, 255, .18);
+            --text: #e8eaf0;
+            --muted: #6b7280;
+            --red: #ff4444;
+            --orange: #ff8c00;
+            --green: #39ff14;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0 10px 80px;
+            background-image:
+                linear-gradient(rgba(0, 255, 255, .03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, .03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        /* ── NAVBAR (floating pill — identical to index.html) ── */
+        .navbar {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translate(-50%, -40px);
+            width: 85%;
+            max-width: 950px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 30px;
+            border-radius: 40px;
+            background: rgba(0, 0, 0, .45);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, .4);
+            box-shadow: 0 0 10px rgba(0, 255, 255, .25), 0 0 20px rgba(255, 255, 0, .2);
+            z-index: 1000;
+            opacity: 0;
+            transition: all .4s ease;
+        }
+
+        .navbar.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .nav-logo {
+            font-family: 'Zolla', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .code {
+            color: #00ffff;
+            text-shadow: 0 0 5px #fff, 0 0 10px #00ffff, 0 0 40px #00ffff, 0 0 80px #008080;
+        }
+
+        .arena {
+            color: #ccff00;
+            text-shadow: 0 0 5px #fff, 0 0 10px #ccff00, 0 0 40px #ccff00, 0 0 80px #88aa00;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #e6e6e6;
+            transition: .3s;
+        }
+
+        .nav-links a:hover {
+            color: #00ffff;
+            text-shadow: 0 0 8px #00ffff;
+        }
+
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid #00ffff;
+            background: transparent;
+            color: #00ffff;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .login-btn:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        /* auth badge + logout inside pill */
+        .ca-auth-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
+
+        .ca-user-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 255, 255, .07);
+            border: 1px solid rgba(0, 255, 255, .25);
+            border-radius: 20px;
+            padding: 4px 10px 4px 6px;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .ca-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #00ffff, #ccff00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .68rem;
+            font-weight: 900;
+            color: #000;
+        }
+
+        .ca-uname {
+            font-size: .72rem;
+            font-weight: 700;
+            color: #00ffff;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ca-pchip {
+            font-size: .55rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            white-space: nowrap;
+        }
+
+        .ca-pchip.free {
+            background: rgba(0, 255, 255, .1);
+            color: #00ffff;
+        }
+
+        .ca-pchip.premium {
+            background: rgba(204, 255, 0, .15);
+            color: #ccff00;
+        }
+
+        .ca-logout {
+            background: none;
+            border: 1px solid rgba(255, 68, 68, .35);
+            color: rgba(255, 68, 68, .75);
+            padding: 4px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .ca-logout:hover {
+            border-color: #ff4444;
+            color: #ff4444;
+            background: rgba(255, 68, 68, .07);
+        }
+
+        /* page body starts below the fixed navbar */
+        body {
+            padding-top: 140px;
+        }
+
+        /* ── PAGE WRAPPER ── */
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* ── NOT LOGGED IN ── */
+        .not-logged {
+            text-align: center;
+            padding: 80px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .not-logged .nl-icon {
+            font-size: 3.5rem;
+        }
+
+        .not-logged h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--cyan);
+        }
+
+        .not-logged p {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .btn-login-big {
+            margin-top: 8px;
+            padding: 14px 36px;
+            background: linear-gradient(135deg, #00ffff, #00b8d4);
+            color: #000;
+            font-weight: 800;
+            font-size: .9rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            transition: all .2s;
+        }
+
+        .btn-login-big:hover {
+            box-shadow: 0 0 28px rgba(0, 255, 255, .5);
+            transform: translateY(-2px);
+        }
+
+        /* ── PROFILE HERO ── */
+        .profile-hero {
+            display: flex;
+            gap: 28px;
+            align-items: flex-start;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top left, rgba(0, 255, 255, .06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hero-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ffff, #ccff00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: #000;
+            border: 3px solid rgba(0, 255, 255, .4);
+            box-shadow: 0 0 30px rgba(0, 255, 255, .25);
+        }
+
+        .hero-plan-ring {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            font-size: .58rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .hero-plan-ring.free {
+            background: rgba(0, 255, 255, .12);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 255, 255, .35);
+        }
+
+        .hero-plan-ring.premium {
+            background: rgba(204, 255, 0, .15);
+            color: var(--yellow);
+            border: 1px solid rgba(204, 255, 0, .4);
+        }
+
+        .hero-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .hero-name {
+            font-family: 'Zolla', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: .04em;
+            margin-bottom: 4px;
+        }
+
+        .hero-email {
+            font-size: .8rem;
+            color: var(--muted);
+            margin-bottom: 12px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .hero-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .hero-chip {
+            font-size: .68rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .hero-chip.rank {
+            background: rgba(255, 215, 0, .1);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, .3);
+        }
+
+        .hero-chip.games {
+            background: rgba(0, 255, 255, .07);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 255, 255, .22);
+        }
+
+        .hero-chip.score {
+            background: rgba(204, 255, 0, .07);
+            color: var(--yellow);
+            border: 1px solid rgba(204, 255, 0, .22);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+            align-items: flex-end;
+        }
+
+        .btn-edit {
+            padding: 9px 20px;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--muted);
+            font-size: .75rem;
+            font-weight: 700;
+            border-radius: 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            transition: all .2s;
+        }
+
+        .btn-edit:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(0, 255, 255, .06);
+        }
+
+        .btn-logout-hero {
+            padding: 9px 20px;
+            background: transparent;
+            border: 1.5px solid rgba(255, 68, 68, .3);
+            color: rgba(255, 68, 68, .7);
+            font-size: .75rem;
+            font-weight: 700;
+            border-radius: 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            transition: all .2s;
+        }
+
+        .btn-logout-hero:hover {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(255, 68, 68, .06);
+        }
+
+        /* ── EDIT FORM (hidden by default) ── */
+        .edit-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            display: none;
+        }
+
+        .edit-panel.open {
+            display: block;
+            animation: fadeIn .25s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .edit-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--cyan);
+            margin-bottom: 18px;
+            letter-spacing: .06em;
+        }
+
+        .edit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .edit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .edit-field label {
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--muted);
+        }
+
+        .edit-field input {
+            background: var(--surface2);
+            border: 1px solid rgba(0, 255, 255, .2);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 7px;
+            font-size: .88rem;
+            outline: none;
+            transition: border-color .2s;
+            font-family: inherit;
+        }
+
+        .edit-field input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 2px rgba(0, 255, 255, .1);
+        }
+
+        .edit-field input:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .edit-err {
+            font-size: .75rem;
+            color: var(--red);
+            min-height: 14px;
+            font-family: monospace;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .btn-save {
+            padding: 11px 28px;
+            background: linear-gradient(135deg, #00ffff, #00b8d4);
+            color: #000;
+            font-weight: 800;
+            font-size: .82rem;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            transition: all .2s;
+        }
+
+        .btn-save:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 255, .4);
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel-edit {
+            padding: 11px 20px;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--muted);
+            font-size: .82rem;
+            font-weight: 700;
+            border-radius: 7px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            transition: all .2s;
+        }
+
+        .btn-cancel-edit:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        @media(max-width:640px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color .2s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 255, 255, .35);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 255, 255, .03) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .stat-icon {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .stat-val {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.55rem;
+            font-weight: 900;
+            color: var(--cyan);
+            text-shadow: 0 0 12px rgba(0, 255, 255, .4);
+        }
+
+        .stat-val.gold {
+            color: var(--gold);
+            text-shadow: 0 0 12px rgba(255, 215, 0, .4);
+        }
+
+        .stat-val.lime {
+            color: var(--yellow);
+            text-shadow: 0 0 12px rgba(204, 255, 0, .4);
+        }
+
+        .stat-val.green {
+            color: var(--green);
+            text-shadow: 0 0 12px rgba(57, 255, 20, .4);
+        }
+
+        .stat-lbl {
+            font-size: .68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            margin-top: 3px;
+        }
+
+        /* ── SECTION LABEL ── */
+        .section-label {
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── GAME BREAKDOWN GRID ── */
+        .game-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        @media(max-width:580px) {
+            .game-breakdown {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .game-card-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            transition: all .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card-stat:hover {
+            border-color: rgba(0, 255, 255, .35);
+            transform: translateY(-2px);
+        }
+
+        .gc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .gc-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gc-icon {
+            font-size: 1.1rem;
+        }
+
+        .gc-name {
+            font-size: .82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text);
+        }
+
+        .gc-badge {
+            font-size: .62rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .gc-badge.hangman {
+            background: rgba(0, 255, 255, .08);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 255, 255, .2);
+        }
+
+        .gc-badge.ttt {
+            background: rgba(204, 255, 0, .08);
+            color: var(--yellow);
+            border: 1px solid rgba(204, 255, 0, .2);
+        }
+
+        .gc-badge.syntax {
+            background: rgba(180, 126, 255, .08);
+            color: #b47eff;
+            border: 1px solid rgba(180, 126, 255, .2);
+        }
+
+        .gc-badge.oracle {
+            background: rgba(255, 140, 0, .08);
+            color: var(--orange);
+            border: 1px solid rgba(255, 140, 0, .2);
+        }
+
+        .gc-stats {
+            display: flex;
+            gap: 18px;
+        }
+
+        .gc-stat {
+            text-align: center;
+        }
+
+        .gc-stat-v {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .gc-stat-l {
+            font-size: .6rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-top: 1px;
+        }
+
+        .gc-bar-wrap {
+            margin-top: 12px;
+            height: 4px;
+            background: rgba(255, 255, 255, .08);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .gc-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width .8s cubic-bezier(.25, .46, .45, .94);
+        }
+
+        /* ── RECENT GAMES TABLE ── */
+        .history-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead tr {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-table thead th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .history-table thead th:last-child {
+            text-align: right;
+        }
+
+        .history-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+            transition: background .15s;
+        }
+
+        .history-table tbody tr:hover {
+            background: rgba(255, 255, 255, .025);
+        }
+
+        .history-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .history-table td {
+            padding: 12px 16px;
+            font-size: .82rem;
+            vertical-align: middle;
+        }
+
+        .history-table td:last-child {
+            text-align: right;
+        }
+
+        .game-pill {
+            display: inline-block;
+            font-size: .64rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .game-pill.hangman {
+            background: rgba(0, 255, 255, .08);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 255, 255, .2);
+        }
+
+        .game-pill.ttt {
+            background: rgba(204, 255, 0, .08);
+            color: var(--yellow);
+            border: 1px solid rgba(204, 255, 0, .2);
+        }
+
+        .game-pill.syntax {
+            background: rgba(180, 126, 255, .08);
+            color: #b47eff;
+            border: 1px solid rgba(180, 126, 255, .2);
+        }
+
+        .game-pill.oracle {
+            background: rgba(255, 140, 0, .08);
+            color: var(--orange);
+            border: 1px solid rgba(255, 140, 0, .2);
+        }
+
+        .diff-pip {
+            display: inline-block;
+            font-size: .64rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .diff-pip.easy {
+            background: rgba(57, 255, 20, .08);
+            color: var(--green);
+            border: 1px solid rgba(57, 255, 20, .22);
+        }
+
+        .diff-pip.medium {
+            background: rgba(255, 140, 0, .08);
+            color: var(--orange);
+            border: 1px solid rgba(255, 140, 0, .22);
+        }
+
+        .diff-pip.hard {
+            background: rgba(255, 68, 68, .08);
+            color: var(--red);
+            border: 1px solid rgba(255, 68, 68, .22);
+        }
+
+        .score-num {
+            font-family: 'Orbitron', monospace;
+            font-size: .9rem;
+            font-weight: 700;
+            color: var(--yellow);
+        }
+
+        .ago-text {
+            font-size: .68rem;
+            color: #444;
+            display: block;
+            margin-top: 1px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .no-history {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: .85rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .no-history .nh-icon {
+            font-size: 2.5rem;
+        }
+
+        /* ── RANK BADGE ── */
+        .rank-banner {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px 28px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .rank-medal {
+            font-size: 2.8rem;
+            line-height: 1;
+        }
+
+        .rank-info {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .rank-label {
+            font-size: .7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            margin-bottom: 3px;
+        }
+
+        .rank-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 900;
+        }
+
+        .rank-sub {
+            font-size: .75rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .rank-progress-wrap {
+            flex: 2;
+            min-width: 200px;
+        }
+
+        .rank-prog-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: .7rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .rank-prog-track {
+            height: 8px;
+            background: rgba(255, 255, 255, .08);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .rank-prog-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 1s cubic-bezier(.25, .46, .45, .94);
+        }
+
+        /* ── TOAST ── */
+        .profile-toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 9999;
+            background: var(--surface2);
+            border: 1px solid rgba(0, 255, 255, .3);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: .8rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .5);
+            transform: translateX(130%);
+            transition: transform .3s cubic-bezier(.175, .885, .32, 1.275);
+        }
+
+        .profile-toast.show {
+            transform: translateX(0);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:640px) {
+            .profile-hero {
+                padding: 24px 20px;
+                gap: 18px;
+            }
+
+            .hero-avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 1.4rem;
+            }
+
+            .hero-name {
+                font-size: 1.4rem;
+            }
+
+            .edit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-actions {
+                flex-direction: row;
+            }
+
+            .history-table th:nth-child(4),
+            .history-table td:nth-child(4) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR (floating pill — same as index.html) -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-logo">
+            <a href="index.html" style="text-decoration:none">
+                <span class="code">Code</span><span class="arena">Arena</span>
+            </a>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="index.html#games">Games</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+            <li><a href="aboutme.html">About</a></li>
+        </ul>
+
+        <div class="nav-auth" id="navAuth">
+            <!-- filled by JS below -->
+        </div>
+    </nav>
+
+    <div class="page" id="main-page"></div>
+
+    <div class="profile-toast" id="pToast"></div>
+
+    <script>
+        /* ── Auth helpers ── */
+        const AU_KEY = 'codearena_user';
+        const ACC_KEY = 'ca_accounts';
+        const LS_SHARED = 'codearena_hangman_scores';
+        const LS_TTT = 'codearena_ttt_scores';
+
+        function getUser() { try { return JSON.parse(localStorage.getItem(AU_KEY)); } catch { return null; } }
+        function saveUser(u) { localStorage.setItem(AU_KEY, JSON.stringify(u)); }
+        function clearUser() { localStorage.removeItem(AU_KEY); }
+
+        function toast(msg) {
+            const t = document.getElementById('pToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._t);
+            t._t = setTimeout(() => t.classList.remove('show'), 3200);
+        }
+
+        /* ── Data helpers ── */
+        function tagGame(e) {
+            const g = (e.game || '').toLowerCase();
+            if (g === 'syntax') return { ...e, _game: 'syntax' };
+            if (g === 'oracle' || g === 'mcq') return { ...e, _game: 'oracle' };
+            if (g === 'ttt' || g === 'tictactoe') return { ...e, _game: 'ttt' };
+            return { ...e, _game: 'hangman' };
+        }
+        function loadAllEntries() {
+            const sh = () => { try { return JSON.parse(localStorage.getItem(LS_SHARED) || '[]'); } catch { return []; } };
+            const tt = () => { try { return JSON.parse(localStorage.getItem(LS_TTT) || '[]'); } catch { return []; } };
+            return [...sh().map(tagGame), ...tt().map(e => ({ ...e, _game: 'ttt' }))];
+        }
+
+        const GAME_LABEL = { hangman: 'Hangman', ttt: 'Tic Tac Toe', syntax: 'Predict Output', oracle: 'Output Oracle' };
+        const GAME_ICON = { hangman: '⌨', ttt: '⊞', syntax: '🖥', oracle: '🔮' };
+        const GAME_COLOR = { hangman: '#00ffff', ttt: '#ccff00', syntax: '#b47eff', oracle: '#ff8c00' };
+
+        function timeAgo(iso) {
+            const d = Date.now() - new Date(iso).getTime(), s = Math.floor(d / 1000);
+            if (s < 60) return 'just now';
+            const m = Math.floor(s / 60); if (m < 60) return `${m}m ago`;
+            const h = Math.floor(m / 60); if (h < 24) return `${h}h ago`;
+            return `${Math.floor(h / 24)}d ago`;
+        }
+        function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        /* ── Rank tiers by total score ── */
+        const RANKS = [
+            { min: 0, name: 'Rookie', color: '#6b7280', medal: '🌱', next: 500 },
+            { min: 500, name: 'Coder', color: '#00ffff', medal: '💻', next: 1500 },
+            { min: 1500, name: 'Dev', color: '#3cba54', medal: '⚡', next: 4000 },
+            { min: 4000, name: 'Hacker', color: '#b47eff', medal: '🔥', next: 10000 },
+            { min: 10000, name: 'Wizard', color: '#ccff00', medal: '🧙', next: 25000 },
+            { min: 25000, name: 'Architect', color: '#ff8c00', medal: '🏗', next: 60000 },
+            { min: 60000, name: 'Oracle', color: '#ffd700', medal: '👁', next: null },
+        ];
+        function getRank(total) {
+            let r = RANKS[0];
+            for (const t of RANKS) if (total >= t.min) r = t;
+            return r;
+        }
+
+        /* ── Global rank position ── */
+        function getGlobalRank(playerName, allEntries) {
+            const map = {};
+            allEntries.forEach(e => {
+                const p = (e.player || 'Anonymous').trim();
+                map[p] = (map[p] || 0) + (e.score || 0);
+            });
+            const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]);
+            const idx = sorted.findIndex(([n]) => n === playerName);
+            return idx === -1 ? null : idx + 1;
+        }
+
+        /* ══════════════════════════════════════════════
+           MAIN RENDER
+        ══════════════════════════════════════════════ */
+        function render() {
+            const page = document.getElementById('main-page');
+            const user = getUser();
+
+            if (!user) {
+                page.innerHTML = `
+      <div class="not-logged">
+        <div class="nl-icon">👤</div>
+        <h2>You're not logged in</h2>
+        <p>Log in to see your profile, scores, and global ranking.</p>
+        <button class="btn-login-big" onclick="window.location.href='index.html'">
+          Go to Home & Login
+        </button>
+      </div>`;
+                return;
+            }
+
+            const name = user.name || user.email || 'Player';
+            const email = user.email || '';
+            const plan = user.plan || 'free';
+            const initials = name.slice(0, 2).toUpperCase();
+
+            /* Build player stats from entries */
+            const allEntries = loadAllEntries();
+            const myEntries = allEntries.filter(e => (e.player || 'Anonymous').trim() === name);
+            const totalScore = myEntries.reduce((a, e) => a + (e.score || 0), 0);
+            const totalGames = myEntries.length;
+            const bestScore = myEntries.length ? Math.max(...myEntries.map(e => e.score || 0)) : 0;
+            const avgScore = totalGames ? Math.round(totalScore / totalGames) : 0;
+
+            /* Per-game breakdown */
+            const byGame = { hangman: { scores: [] }, ttt: { scores: [] }, syntax: { scores: [] }, oracle: { scores: [] } };
+            myEntries.forEach(e => { if (byGame[e._game]) byGame[e._game].scores.push(e); });
+
+            /* Recent 10 sorted newest first */
+            const recent = [...myEntries]
+                .filter(e => e.isoDate)
+                .sort((a, b) => b.isoDate > a.isoDate ? 1 : -1)
+                .slice(0, 10);
+
+            /* Rank */
+            const rank = getRank(totalScore);
+            const nextRank = RANKS[RANKS.indexOf(rank) + 1];
+            const rankPct = rank.next
+                ? Math.min(100, Math.round(((totalScore - rank.min) / (rank.next - rank.min)) * 100))
+                : 100;
+            const globalRank = getGlobalRank(name, allEntries);
+            const maxGameScore = Math.max(1, ...Object.values(byGame).map(g => g.scores.reduce((a, e) => a + (e.score || 0), 0)));
+
+            /* ── BUILD HTML ── */
+            page.innerHTML = `
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="hero-avatar-wrap">
+      <div class="hero-avatar">${initials}</div>
+      <span class="hero-plan-ring ${plan}">${plan === 'premium' ? '★ PRO' : 'FREE'}</span>
+    </div>
+    <div class="hero-info">
+      <div class="hero-name">${esc(name)}</div>
+      <div class="hero-email">${esc(email)}</div>
+      <div class="hero-chips">
+        ${globalRank ? `<span class="hero-chip rank"># ${globalRank} Global</span>` : ''}
+        <span class="hero-chip games">${totalGames} Round${totalGames !== 1 ? 's' : ''} Played</span>
+        <span class="hero-chip score">${totalScore.toLocaleString()} pts Total</span>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-edit" id="editToggleBtn">✏ Edit Profile</button>
+      <button class="btn-logout-hero" id="logoutHeroBtn">Logout</button>
+    </div>
+  </div>
+
+  <!-- EDIT PANEL -->
+  <div class="edit-panel" id="editPanel">
+    <div class="edit-title">EDIT PROFILE</div>
+    <div class="edit-grid">
+      <div class="edit-field">
+        <label>Username</label>
+        <input type="text" id="ep-name" value="${esc(name)}" placeholder="YourCallsign">
+      </div>
+      <div class="edit-field">
+        <label>Email (read-only)</label>
+        <input type="email" id="ep-email" value="${esc(email)}" disabled>
+      </div>
+      <div class="edit-field">
+        <label>New Password</label>
+        <input type="password" id="ep-pass" placeholder="Leave blank to keep current">
+      </div>
+      <div class="edit-field">
+        <label>Confirm Password</label>
+        <input type="password" id="ep-pass2" placeholder="Repeat new password">
+      </div>
+    </div>
+    <div class="edit-err" id="ep-err"></div>
+    <div class="edit-actions">
+      <button class="btn-save" id="ep-save">Save Changes</button>
+      <button class="btn-cancel-edit" id="ep-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-val gold">${totalScore.toLocaleString()}</div>
+      <div class="stat-lbl">Total Score</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-val lime">${bestScore.toLocaleString()}</div>
+      <div class="stat-lbl">Best Single Round</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-val">${avgScore.toLocaleString()}</div>
+      <div class="stat-lbl">Avg Score / Round</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎮</div>
+      <div class="stat-val green">${totalGames}</div>
+      <div class="stat-lbl">Rounds Played</div>
+    </div>
+  </div>
+
+  <!-- RANK BANNER -->
+  <div class="rank-banner">
+    <div class="rank-medal">${rank.medal}</div>
+    <div class="rank-info">
+      <div class="rank-label">Current Rank</div>
+      <div class="rank-name" style="color:${rank.color}">${rank.name}</div>
+      <div class="rank-sub">${nextRank ? `${(rank.next - totalScore).toLocaleString()} pts to ${nextRank.name}` : 'Max rank achieved!'}</div>
+    </div>
+    <div class="rank-progress-wrap">
+      <div class="rank-prog-header">
+        <span>${rank.name}</span>
+        <span>${rankPct}%${nextRank ? ' → ' + nextRank.name : ' MAX'}</span>
+      </div>
+      <div class="rank-prog-track">
+        <div class="rank-prog-fill" id="rankFill" style="width:0%;background:${rank.color}"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME BREAKDOWN -->
+  <div class="section-label">Game Breakdown</div>
+  <div class="game-breakdown">
+    ${Object.entries(byGame).map(([game, data]) => {
+                const sc = data.scores;
+                const tot = sc.reduce((a, e) => a + (e.score || 0), 0);
+                const best = sc.length ? Math.max(...sc.map(e => e.score || 0)) : 0;
+                const rounds = sc.length;
+                const barPct = maxGameScore > 0 ? Math.round((tot / maxGameScore) * 100) : 0;
+                return `
+      <div class="game-card-stat">
+        <div class="gc-header">
+          <div class="gc-title">
+            <span class="gc-icon">${GAME_ICON[game]}</span>
+            <span class="gc-name">${GAME_LABEL[game]}</span>
+          </div>
+          <span class="gc-badge ${game}">${rounds} rounds</span>
+        </div>
+        <div class="gc-stats">
+          <div class="gc-stat">
+            <div class="gc-stat-v" style="font-family:'Orbitron',monospace">${tot.toLocaleString()}</div>
+            <div class="gc-stat-l">Total</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-v" style="font-family:'Orbitron',monospace">${best.toLocaleString()}</div>
+            <div class="gc-stat-l">Best</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-v" style="font-family:'Orbitron',monospace">${rounds ? Math.round(tot / rounds).toLocaleString() : '—'}</div>
+            <div class="gc-stat-l">Avg</div>
+          </div>
+        </div>
+        <div class="gc-bar-wrap">
+          <div class="gc-bar-fill" style="width:${barPct}%;background:${GAME_COLOR[game]}"></div>
+        </div>
+      </div>`;
+            }).join('')}
+  </div>
+
+  <!-- RECENT HISTORY -->
+  <div class="section-label">Recent Games</div>
+  <div class="history-wrap">
+    ${recent.length === 0 ? `
+    <div class="no-history">
+      <div class="nh-icon">🎮</div>
+      <p>No games played yet. <a href="index.html" style="color:var(--cyan)">Start playing</a> to see your history here.</p>
+    </div>` : `
+    <table class="history-table">
+      <thead><tr>
+        <th>#</th>
+        <th>Game</th>
+        <th>Category</th>
+        <th>Difficulty</th>
+        <th>Date</th>
+        <th>Score</th>
+      </tr></thead>
+      <tbody>
+        ${recent.map((e, i) => `
+        <tr>
+          <td style="color:var(--muted);font-family:'Orbitron',monospace;font-size:.72rem">${i + 1}</td>
+          <td><span class="game-pill ${e._game}">${GAME_ICON[e._game]} ${GAME_LABEL[e._game]}</span></td>
+          <td><span style="font-size:.75rem;color:var(--muted);font-family:'Share Tech Mono',monospace">${esc(e.category || '—')}</span></td>
+          <td><span class="diff-pip ${e.difficulty || ''}">${e.difficulty || '—'}</span></td>
+          <td class="ago-text" style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--muted)">
+            ${e.date || '—'}<span class="ago-text">${e.isoDate ? timeAgo(e.isoDate) : ''}</span>
+          </td>
+          <td><span class="score-num">${(e.score || 0).toLocaleString()}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`}
+  </div>`;
+
+            /* Animate rank bar */
+            setTimeout(() => {
+                const fill = document.getElementById('rankFill');
+                if (fill) fill.style.width = rankPct + '%';
+            }, 100);
+
+            /* Wire edit toggle */
+            document.getElementById('editToggleBtn').addEventListener('click', () => {
+                const panel = document.getElementById('editPanel');
+                panel.classList.toggle('open');
+                if (panel.classList.contains('open')) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+            document.getElementById('ep-cancel').addEventListener('click', () => {
+                document.getElementById('editPanel').classList.remove('open');
+            });
+
+            /* Wire save */
+            document.getElementById('ep-save').addEventListener('click', () => {
+                const newName = document.getElementById('ep-name').value.trim();
+                const pass1 = document.getElementById('ep-pass').value;
+                const pass2 = document.getElementById('ep-pass2').value;
+                const err = document.getElementById('ep-err');
+                if (!newName) { err.textContent = '⚠ Username cannot be empty.'; return; }
+                if (pass1 && pass1.length < 6) { err.textContent = '⚠ Password must be 6+ characters.'; return; }
+                if (pass1 !== pass2) { err.textContent = '⚠ Passwords do not match.'; return; }
+                err.textContent = '';
+
+                /* Update stored user */
+                const u = getUser();
+                u.name = newName;
+                saveUser(u);
+
+                /* Update ca_accounts */
+                const accs = JSON.parse(localStorage.getItem(ACC_KEY) || '{}');
+                if (accs[u.email]) {
+                    accs[u.email].name = newName;
+                    if (pass1) accs[u.email].password = btoa(pass1);
+                    localStorage.setItem(ACC_KEY, JSON.stringify(accs));
+                }
+
+                document.getElementById('editPanel').classList.remove('open');
+                toast('✅ Profile updated!');
+                render();  /* re-render with new name */
+                renderNavAuth();
+            });
+
+            /* Wire logout */
+            document.getElementById('logoutHeroBtn').addEventListener('click', () => {
+                if (!confirm('Log out of CodeArena?')) return;
+                clearUser();
+                toast('👋 Logged out!');
+                setTimeout(() => window.location.href = 'index.html', 1200);
+            });
+        }
+
+        /* ── Navbar scroll reveal (matches index.html) ── */
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('show', window.scrollY > 50);
+        });
+        setTimeout(() => document.getElementById('navbar').classList.add('show'), 60);
+
+        /* ── Navbar auth badge ── */
+        function renderNavAuth() {
+            const navAuth = document.getElementById('navAuth');
+            if (!navAuth) return;
+            const user = getUser();
+            if (!user) {
+                navAuth.innerHTML = `<button class="login-btn" id="navLoginBtn">Login</button>`;
+                document.getElementById('navLoginBtn').onclick = () => window.location.href = 'index.html';
+            } else {
+                const initials = (user.name || user.email || 'U').slice(0, 2).toUpperCase();
+                const plan = user.plan || 'free';
+                navAuth.innerHTML = `
+      <div class="ca-auth-row">
+        <a class="ca-user-badge" href="profile.html" style="text-decoration:none">
+          <div class="ca-avatar">${initials}</div>
+          <span class="ca-uname">${user.name || user.email}</span>
+          <span class="ca-pchip ${plan}">${plan}</span>
+        </a>
+        <button class="ca-logout" id="navLogoutBtn">Logout</button>
+      </div>`;
+                document.getElementById('navLogoutBtn').onclick = () => {
+                    clearUser();
+                    toast('👋 Logged out!');
+                    setTimeout(() => window.location.href = 'index.html', 1200);
+                };
+            }
+        }
+
+        renderNavAuth();
+        render();
+    </script>
+</body>
+
+</html>

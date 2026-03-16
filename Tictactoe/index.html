@@ -2176,8 +2176,7 @@
         date: new Date().toLocaleDateString(),
         isoDate: new Date().toISOString(),
         game: 'tictactoe',
-        player: (() => { try { return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; } catch { return 'Anonymous'; } })()
-      });
+        player: (()=>{ try{ return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; }catch{ return 'Anonymous'; } })()      });
       arr.sort((a, b) => b.score - a.score);
       arr.splice(50);
       localStorage.setItem(LS_TTT, JSON.stringify(arr));

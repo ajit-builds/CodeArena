@@ -293,9 +293,9 @@
 <!-- STATUS BAR (hidden until wizard done) -->
 <div class="status-bar" id="statusBar" style="display:none">
   <div class="status-pills">
-    <span class="status-pill"       id="sPillLang">JS</span>
-    <span class="status-pill muted" id="sPillDiff">Easy · 40s</span>
-    <span class="status-pill muted" id="sPillQ">Q 1 / 5</span>
+    <span class="status-pill"       id="sPillLang"style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">JS</span>
+    <span class="status-pill muted" id="sPillDiff" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Easy · 40s</span>
+    <span class="status-pill muted" id="sPillQ" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Q 1 / 5</span>
   </div>
   <button class="change-btn" id="changeSetupBtn">⚙ Change Setup</button>
 </div>
@@ -319,15 +319,15 @@
     <div class="code-block ph" id="codeBlock">← Select language &amp; difficulty to begin</div>
     <div class="score-display">
       <div class="score-label">Session Score</div>
-      <div class="score-value" id="liveScore">0</div>
+      <div class="score-value" id="liveScore" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0</div>
     </div>
     <div class="session-stats">
-      <div class="stat-chip"><div class="s-label">Correct</div><div class="s-val" id="statCorrect">0</div></div>
-      <div class="stat-chip"><div class="s-label">Streak</div> <div class="s-val" id="statStreak">0</div></div>
-      <div class="stat-chip"><div class="s-label">Best</div>   <div class="s-val" id="statBest">0</div></div>
+      <div class="stat-chip"><div class="s-label">Correct</div><div class="s-val" id="statCorrect" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0</div></div>
+      <div class="stat-chip"><div class="s-label">Streak</div> <div class="s-val" id="statStreak" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0</div></div>
+      <div class="stat-chip"><div class="s-label">Best</div>   <div class="s-val" id="statBest" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0</div></div>
     </div>
     <div class="level-bar-wrap">
-      <div class="level-bar-hdr"><span id="levelLabel">Level 1</span><span id="levelProg">0 / 5</span></div>
+      <div class="level-bar-hdr"><span id="levelLabel" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Level 1</span><span id="levelProg" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0 / 5</span></div>
       <div class="level-bar-track"><div class="level-bar-fill" id="levelFill" style="width:0%"></div></div>
     </div>
   </div>
@@ -342,7 +342,7 @@
     <div id="gameArea">
       <!-- WIZARD STEP 1 -->
       <div class="wizard-step active" id="wz-lang">
-        <div class="wz-step-label">Step 1 of 2</div>
+        <div class="wz-step-label" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Step 1 of 2</div>
         <div class="wz-title">Choose a Language</div>
         <div class="wz-options">
           <button class="wz-btn" data-lang="javascript"><span class="wz-icon">JS</span><span class="wz-name">JavaScript</span><span class="wz-sub">Types, closures, async quirks</span></button>
@@ -354,7 +354,7 @@
       <!-- WIZARD STEP 2 -->
       <div class="wizard-step" id="wz-diff">
         <button class="wz-back" id="backBtn">← Back</button>
-        <div class="wz-step-label">Step 2 of 2</div>
+        <div class="wz-step-label" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Step 2 of 2</div>
         <div class="wz-title">Choose Difficulty</div>
         <div class="wz-options">
           <button class="wz-btn diff-easy"   data-diff="easy">  <span class="wz-icon">🟢</span><span class="wz-name">Easy</span>  <span class="wz-sub">40 seconds · 100 pts base</span></button>
@@ -372,13 +372,13 @@
   <div class="modal-box">
     <div class="modal-emoji" id="mEmoji">🏆</div>
     <div class="modal-title win" id="mTitle">Round Complete!</div>
-    <div class="modal-sub"       id="mSub">You answered 5 questions.</div>
+    <div class="modal-sub"       id="mSub" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">You answered 5 questions.</div>
     <div class="score-earned-block">
-      <div class="se-row"><span>Correct Answers</span><span id="seCorrect">0 / 5</span></div>
-      <div class="se-row"><span>Time Bonus</span>     <span id="seTime">+0</span></div>
-      <div class="se-row"><span>Streak Bonus</span>   <span id="seStreak">+0</span></div>
+      <div class="se-row"><span>Correct Answers</span><span id="seCorrect" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0 / 5</span></div>
+      <div class="se-row"><span>Time Bonus</span>     <span id="seTime" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">+0</span></div>
+      <div class="se-row"><span>Streak Bonus</span>   <span id="seStreak" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">+0</span></div>
       <hr class="se-divider">
-      <div class="se-total" id="seTotal">0 pts</div>
+      <div class="se-total" id="seTotal" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">0 pts</div>
     </div>
     <div class="modal-btn-row">
       <button class="btn-primary"   id="playAgainBtn">▶ Play Again</button>
@@ -392,7 +392,7 @@
   <div class="modal-box">
     <div class="modal-emoji">⏰</div>
     <div class="modal-title timeout">Time's Up!</div>
-    <div class="modal-sub" id="toSub">The correct answer was —</div>
+    <div class="modal-sub" id="toSub" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">The correct answer was —</div>
     <div class="modal-btn-row">
       <button class="btn-primary" id="toNextBtn">→ Next Question</button>
     </div>
@@ -724,8 +724,7 @@ function endRound(){
     score:total,word:currentLang.toUpperCase()+' MCQ',
     category:currentLang,difficulty:currentDiff,
     date:new Date().toLocaleDateString(),isoDate:new Date().toISOString(),game:'oracle',
-    player: (()=>{ try{ return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; }catch{return 'Anonymous';} })()
-  });
+    player: (()=>{ try{ return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; }catch{ return 'Anonymous'; } })()  });
   scores.sort((a,b)=>b.score-a.score); scores.splice(50);
   localStorage.setItem(LS_KEY,JSON.stringify(scores));
 

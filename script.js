@@ -14,6 +14,13 @@ function clearUser()  { localStorage.removeItem(AUTH_KEY); }
 function isLoggedIn() { return !!getUser(); }
 function isPremium()  { return getUser()?.plan === 'premium'; }
 
+// Returns the display name of the logged-in user, used to tag scores
+function getPlayerName() {
+  const u = getUser();
+  if (!u) return 'Anonymous';
+  return (u.name || u.email || 'Anonymous').trim();
+}
+
 // Valid coupon codes
 const COUPONS = {
   'ARENA2026': 'premium',
@@ -229,37 +236,46 @@ function injectAuthModals() {
   .ca-coupon-row input:focus { border-color:#ccff00;box-shadow:0 0 0 2px rgba(204,255,0,.1); }
   .ca-coupon-row .ca-primary { width:auto;padding:9px 16px;font-size:.78rem;margin:0;flex-shrink:0;background:linear-gradient(135deg,#ccff00,#aacc00); }
 
-  /* Navbar user badge */
+  /* .auth wrapper — never expands navbar height */
+  .auth {
+    display:inline-flex;align-items:center;
+    flex-shrink:0;
+  }
+
+  /* Navbar user badge — single inline row, never expands navbar height */
   .ca-auth-row {
-    display:flex;align-items:center;gap:6px;flex-wrap:nowrap;
+    display:inline-flex;align-items:center;gap:5px;
+    flex-wrap:nowrap;height:32px; /* matches the pill navbar's inner height */
   }
   .ca-user-badge {
-    display:flex;align-items:center;gap:6px;
+    display:inline-flex;align-items:center;gap:5px;
     background:rgba(0,255,255,.07);border:1px solid rgba(0,255,255,.25);
-    border-radius:20px;padding:4px 10px 4px 6px;cursor:default;
-    white-space:nowrap;
+    border-radius:20px;padding:3px 10px 3px 5px;
+    text-decoration:none;white-space:nowrap;height:28px;
   }
   .ca-avatar {
-    width:26px;height:26px;border-radius:50%;flex-shrink:0;
+    width:22px;height:22px;border-radius:50%;flex-shrink:0;
     background:linear-gradient(135deg,#00ffff,#ccff00);
-    display:flex;align-items:center;justify-content:center;
-    font-size:.68rem;font-weight:900;color:#000;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:.64rem;font-weight:900;color:#000;
   }
   .ca-uname {
-    font-size:.72rem;font-weight:700;color:#00ffff;
-    max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-size:.7rem;font-weight:700;color:#00ffff;
+    max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    line-height:1;
   }
   .ca-pchip {
-    font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:99px;
-    text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;
+    font-size:.52rem;font-weight:700;padding:1px 5px;border-radius:99px;
+    text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;line-height:1;
   }
   .ca-pchip.free    { background:rgba(0,255,255,.1);color:#00ffff; }
   .ca-pchip.premium { background:rgba(204,255,0,.15);color:#ccff00; }
   .ca-logout {
-    background:none;border:1px solid rgba(255,68,68,.35);color:rgba(255,68,68,.75);
-    padding:4px 10px;border-radius:16px;cursor:pointer;
-    font-size:.68rem;font-weight:700;text-transform:uppercase;
-    letter-spacing:.04em;transition:all .2s;white-space:nowrap;flex-shrink:0;
+    background:none;border:1px solid rgba(255,68,68,.3);color:rgba(255,68,68,.7);
+    padding:3px 9px;border-radius:14px;cursor:pointer;
+    font-size:.64rem;font-weight:700;text-transform:uppercase;
+    letter-spacing:.04em;transition:all .2s;white-space:nowrap;
+    height:24px;display:inline-flex;align-items:center;flex-shrink:0;
   }
   .ca-logout:hover { border-color:#ff4444;color:#ff4444;background:rgba(255,68,68,.07); }
 
@@ -306,11 +322,11 @@ function updateNavbar() {
     const plan     = user.plan || 'free';
     auth.innerHTML = `
       <div class="ca-auth-row">
-        <div class="ca-user-badge">
+        <a class="ca-user-badge" href="profile.html" title="View Profile">
           <div class="ca-avatar">${initials}</div>
           <span class="ca-uname">${user.name || user.email}</span>
           <span class="ca-pchip ${plan}">${plan}</span>
-        </div>
+        </a>
         <button class="ca-logout" id="logoutBtn">Logout</button>
       </div>`;
     document.getElementById('logoutBtn').addEventListener('click', () => {

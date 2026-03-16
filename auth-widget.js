@@ -258,13 +258,16 @@
       } else {
         const initials = (user.name || user.email || 'U').slice(0,2).toUpperCase();
         const plan     = user.plan || 'free';
+        // Detect if we're one folder deep (game pages) or root
+        const isRoot   = !location.pathname.split('/').filter(Boolean).some(p => p.endsWith('.html') && location.pathname.split('/').length > 2);
+        const profileHref = document.querySelector('a[href="../index.html"]') ? '../profile.html' : 'profile.html';
         target.innerHTML = `
           <div class="ca-auth-row">
-            <div class="ca-user-badge">
+            <a class="ca-user-badge" href="${profileHref}" title="View Profile" style="text-decoration:none">
               <div class="ca-avatar">${initials}</div>
               <span class="ca-uname">${user.name || user.email}</span>
               <span class="ca-pchip ${plan}">${plan}</span>
-            </div>
+            </a>
             <button class="ca-logout ca-wg-logout">Logout</button>
           </div>`;
         target.querySelector('.ca-wg-logout').addEventListener('click', () => {
