@@ -2,12 +2,47 @@
 <html>
 
 <head>
+
     <title>Landing Page</title>
     <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.3/dist/dotlottie-wc.js" type="module"></script>
-
-
+    <script src="rocket-cursor.js" defer></script>
+    <link rel="icon" type="image/jpeg" href="https://i.pinimg.com/736x/5e/ee/63/5eee6330d8abef841475b9a80125306e.jpg">
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
+    <style>
+        /* ── Community game card badge ── */
+        .card-tag.community-tag {
+            background: linear-gradient(135deg, #00ffff, #ccff00);
+            color: #000;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Hover glow matches the community cyan/lime palette ── */
+        .community-game-card:hover {
+            border-color: #ccff00 !important;
+            box-shadow: 0 0 28px rgba(204, 255, 0, 0.25), 0 0 60px rgba(0, 255, 255, 0.1) !important;
+        }
+
+        /* ── "New" pulse ring on cards published in last 10 min ── */
+        @keyframes new-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(204, 255, 0, 0.6);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(204, 255, 0, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(204, 255, 0, 0);
+            }
+        }
+
+        .community-game-card.is-new {
+            animation: new-ring 2s ease-out 3;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,13 +60,13 @@
     <nav class="navbar">
 
         <div class="logo">
-            <span class="code">Code</span><span class="arena">Arena</span>
+            <a href="#header-content"> <span class="code">Code</span><span class="arena">Arena</span></a>
         </div>
 
         <ul class="nav-links">
-            <li><a href="#">Games</a></li>
-            <li><a href="#">Leaderboard</a></li>
-            <li><a href="#">About</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+            <li><a href="aboutme.html">About</a></li>
         </ul>
 
         <div class="auth">
@@ -39,23 +74,23 @@
         </div>
 
     </nav>
-    <header>
+    <header class="header-content" id="header-content">
         <div class="body-content">
             <video autoplay muted loop class="bg-video">
                 <source src="https://www.pexels.com/download/video/3130284/" type="video/mp4">
             </video>
             <div class="img-content">
-                
+
                 <div class="navbar-arcade">
                     <ul class="nav-links-arcade">
-                        <li><a href="#">Levels</a></li>
-                        <li><a href="#">Projects</a></li>
-                        <li><a href="#">Community</a></li>
+                        <li><a href="hangmanPage/hangman.html">Levels</a></li>
+                        <li><a href="GameBuilder/gamebuilder.html">Projects</a></li>
+                        <li><a href="#games">Community</a></li>
                     </ul>
                 </div>
                 <h1 class="mainlogo-text">
                     <div>
-                        <a href="#"><span class="code">Code</span><span class="arena">Arena</span>
+                        <a href="index.html"><span class="code">Code</span><span class="arena">Arena</span>
                         </a>
                     </div>
                 </h1>
@@ -65,10 +100,10 @@
                 </div>
                 <div class="Second-navbar">
                     <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Games</a></li>
-                        <li><a href="#">Leaderboard</a></li>
-                        <li><a href="#">About us</a></li>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#games">Games</a></li>
+                        <li><a href="leaderboard.html">Leaderboard</a></li>
+                        <li><a href="aboutme.html">About Me</a></li>
                     </ul>
                 </div>
 
@@ -80,94 +115,154 @@
         </div>
     </header>
     <main class="main-content">
-        <section class="programdiff">
-            <h1 class="level2-title ">What makes programming difficult?</h1>
-            <div class="programdiff-scrollbar">
-                <div class="card">
-                    <img src="https://i.pinimg.com/736x/c2/5d/ac/c25dacabffd595a34294db8472382af4.jpg">
-                    <h2>Too Much Theory</h2>
-            
-                </div>
-                <div class="card">
-                    <img src="https://i.pinimg.com/736x/51/f0/7a/51f07a9274c577f6df844fe1f579fe0c.jpg">
-                    <h2>Hard to Visualize</h2>
-                    
-                </div>
-                <div class="card">
-                    <img src="https://i.pinimg.com/1200x/7a/b9/5f/7ab95f67b1193598940118c0daf70191.jpg">
-                    <h2>Debugging Chaos</h2>
-                </div>
-                <div class="card">
-                    <img src="https://i.pinimg.com/736x/4d/ad/32/4dad3248af08e4f7d9cd489cf544eaeb.jpg">
-                    <h2>Losing Motivation</h2>
-                </div>
-                <div class="card">
-                    <img src="https://i.pinimg.com/1200x/8f/1a/e6/8f1ae6ba68255f3f9367d06de0b4bf99.jpg">
-                    <h2>Learning Alone</h2>
+        <section class="horizontal-scroll-container">
+            <div class="sticky-wrapper">
+                <div class="programdiff">
+                    <h1 class="level2-title">What makes programming difficult?</h1>
+                    <div class="programdiff-scrollbar">
+                        <div class="card">
+                            <img src="https://i.pinimg.com/736x/c2/5d/ac/c25dacabffd595a34294db8472382af4.jpg">
+                            <h2>Too Much Theory</h2>
+                        </div>
+                        <div class="card">
+                            <img src="https://i.pinimg.com/736x/51/f0/7a/51f07a9274c577f6df844fe1f579fe0c.jpg">
+                            <h2>Hard to Visualize</h2>
+                        </div>
+                        <div class="card">
+                            <img src="https://i.pinimg.com/1200x/7a/b9/5f/7ab95f67b1193598940118c0daf70191.jpg">
+                            <h2>Debugging Chaos</h2>
+                        </div>
+                        <div class="card">
+                            <img src="https://i.pinimg.com/736x/4d/ad/32/4dad3248af08e4f7d9cd489cf544eaeb.jpg">
+                            <h2>Losing Motivation</h2>
+                        </div>
+                        <div class="card">
+                            <img src="https://i.pinimg.com/1200x/8f/1a/e6/8f1ae6ba68255f3f9367d06de0b4bf99.jpg">
+                            <h2>Learning Alone</h2>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
-        <section class="games">
-            <h1 class="level3-title"> Games Library</h1>
-            <h2 class="level3-subtitle">Choose Your Challenge</h2>
+        <section class="games" id="games">
+            <div class="games-header">
+                <h1 class="level3-title">Games Library</h1>
+                <h2 class="level3-subtitle">Choose Your Challenge</h2>
+
+                <div class="game-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="syntax">Syntax</button>
+                    <button class="filter-btn" data-filter="layout">Layout</button>
+                    <button class="filter-btn" data-filter="logic">Logic</button>
+                </div>
+            </div>
+
             <div class="game-grid">
-                <div class="game-card">
-                    <img src="https://i.pinimg.com/736x/c2/5d/ac/c25dacabffd595a34294db8472382af4.jpg" alt="Game 1">
-                    <h3>Game 1</h3>
+                <div class="game-card" data-category="syntax logic">
+                    <div class="card-tag">HTML / JS / C++</div>
+                    <img src="https://i.pinimg.com/736x/c1/64/b1/c164b131dc7bd90e3b47afdbe867d256.jpg" alt="Hangman">
+                    <div class="game-info">
+                        <h3>Hangman</h3>
+                        <p>Save the character by guessing the correct programming keywords!</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
                 </div>
-                <div class="game-card">
-                    <img src="https://i.pinimg.com/736x/51/f0/7a/51f07a9274c577f6df844fe1f579fe0c.jpg" alt="Game 2">
-                    <h3>Game 2</h3>
+
+                <div class="game-card premium" data-category="layout" data-premium="true">
+                    <div class="card-tag gold">Premium</div>
+                    <img src="https://i.pinimg.com/1200x/4e/aa/c6/4eaac6c004602e2e0467d24c1cd90d48.jpg"
+                        alt="Tic Tac Toe">
+                    <div class="game-info">
+                        <h3>Tic Tac Toe</h3>
+                        <p>Master Flexbox and CSS Grid logic in this high-stakes 3x3 arena.</p>
+                        <button class="play-btn premium-btn">Unlock with Pro</button>
+                    </div>
                 </div>
-                <div class="game-card">
-                    <img src="https://i.pinimg.com/1200x/7a/b9/5f/7ab95f67b1193598940118c0daf70191.jpg" alt="Game 3">
-                    <h3>Game 3</h3>
+                <div class="game-card" data-category="syntax logic">
+                    <div class="card-tag">JS / Python / C++ / CSS</div>
+                    <img src="https://i.pinimg.com/originals/75/87/df/7587df77ef521cf98057d0028ee983f1.gif"
+                        alt="Predict the Output">
+                    <div class="game-info">
+                        <h3>Predict the Output</h3>
+                        <p>Read the code snippet and guess what it prints. Test your knowledge of syntax, scoping, and
+                            language quirks!</p>
+                        <button class="play-btn">Play Now</button>
+                    </div>
+                </div>
+                <div class="game-card" data-category="syntax logic">
+                    <div class="card-tag">JS / Python / C++ / CSS</div>
+                    <img src="https://i.pinimg.com/1200x/ff/3a/ac/ff3aacec2034f65099999f19137807db.jpg"
+                        alt="Output Oracle">
+                    <div class="game-info">
+                        <h3>Output Oracle</h3>
+                        <p>Read a code snippet and predict its output. Test your knowledge across 4 languages and 3
+                            difficulty levels!</p>
+                        <button class="play-btn"> Play Now</button>
+                    </div>
                 </div>
             </div>
         </section>
+
+
         <section class="publish-game">
+            <div class="cta-container">
+                <div class="cta-glow-circle"></div>
 
-    <h1 class="publish-title">Create Your Own Game</h1>
+                <h1 class="publish-title">Become a Creator</h1>
+                <p class="publish-text">
+                    Don't just play the game—build it. Share your custom levels, logic puzzles, and syntax challenges
+                    with the <span class="code">Code</span><span class="arena">Arena</span> community.
+                </p>
 
-    <p class="publish-text">
-        Turn your code into an interactive challenge and share it with the CodeArena community.
-    </p>
+                <div class="cta-features">
+                    <div class="feature-item"><span>✦</span> Custom Logic</div>
+                    <div class="feature-item"><span>✦</span> Global Leaderboards</div>
+                    <div class="feature-item"><span>✦</span> Instant Hosting</div>
+                </div>
 
-    <button class="publish-btn">Publish Your Game</button>
-
-</section>
+                <button class="publish-btn pulse-animation">
+                    <span>Launch Game Builder</span>
+                    <div class="btn-glitch"></div>
+                </button>
+            </div>
+        </section>
     </main>
-    <footer class="footer">
+    <footer class="footer" id="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2 class="footer-logo">
+                    <span class="code">Code</span><span class="arena">Arena</span>
+                </h2>
+                <p class="footer-tagline">Level up your coding game. Play, Create, and Conquer.</p>
+            </div>
 
-    <h2 class="footer-logo">
-        <span class="code">Code</span><span class="arena">Arena</span>
-    </h2>
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Platform</h3>
+                    <a href="#games">Games Library</a>
+                    <a href="Tictactoe/index.html">Arcade Mode</a>
+                    <a href="leaderboard.html">Leaderboards</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Community</h3>
+                    <a href="hangmanPage/hangman.html">Join Games</a>
+                    <a href="Tictactoe/index.html">Play Tic Tac Toe</a>
+                    <a href="GameBuilder/gamebuilder.html">Creator Hub</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <a href="README.md">Documentation</a>
+                    <a href="index.html#games">Help Center</a>
+                    <a href="aboutme.html">Contact Us</a>
+                </div>
+            </div>
+        </div>
 
-    <p class="footer-tagline">
-        Play • Create • Share
-    </p>
-
-    <div class="footer-links">
-
-        <a href="#">Games</a>
-        <a href="#">Publish</a>
-        <a href="#">Leaderboard</a>
-        <a href="#">About</a>
-
-    </div>
-
-    <div class="footer-social">
-
-        <a href="#">GitHub</a>
-        <a href="#">Contact</a>
-
-    </div>
-
-    <p class="footer-copy">
-        © 2026 CodeArena
-    </p>
-
-</footer>
+        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 CodeArena. Built by Ajit.</p>
+            <button id="backToTop" class="back-to-top">↑</button>
+        </div>
+    </footer>
 
 </body>
 

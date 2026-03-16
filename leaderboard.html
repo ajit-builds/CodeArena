@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaderboard | CodeArena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="rocket-cursor.js" defer></script>
+
+  <style>
+  /* ── Reset & Tokens ─────────────────────────── */
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  @font-face {
+    font-family: 'Zolla';
+    src: url('assets/Zolla.woff2') format('woff2');
+    font-weight: normal; font-style: normal; font-display: swap;
+  }
+
+  :root {
+    --cyan:    #00ffff;
+    --lime:    #ccff00;
+    --bg:      #080808;
+    --surf:    #0f1014;
+    --surf2:   #141418;
+    --surf3:   #1a1a20;
+    --border:  rgba(0,255,255,.15);
+    --border2: rgba(0,255,255,.28);
+    --text:    #e8eaf0;
+    --muted:   #6b7280;
+    --red:     #ff4444;
+    --orange:  #ff8c00;
+    --green:   #39ff5e;
+    --gold:    #ffd700;
+    --silver:  #c0c0c0;
+    --bronze:  #cd7f32;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Zolla', 'Open Sans', sans-serif;
+    min-height: 100vh;
+    background-image:
+      linear-gradient(rgba(0,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,255,.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  a { text-decoration: none; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius:3px; }
+
+  /* ── Header ─────────────────────────────────── */
+  .site-header {
+    width: 100%;
+    background: rgba(8,8,8,.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border2);
+    padding: 0 40px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 0 30px rgba(0,255,255,.06);
+  }
+
+  .logo-text {
+    font-family: 'Zolla', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .logo-text .code {
+    color: #00ffff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #00ffff, 0 0 35px #00ffff, 0 0 70px #008080;
+  }
+  .logo-text .arena {
+    color: #ccff00;
+    text-shadow: 0 0 5px #fff, 0 0 10px #ccff00, 0 0 35px #ccff00, 0 0 70px #6b8500;
+  }
+
+  .header-nav { display:flex; align-items:center; gap:10px; }
+  .nav-pill {
+    padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    letter-spacing: .6px; text-transform: uppercase; cursor: pointer;
+    transition: all .2s; border: 1px solid transparent; color: var(--muted);
+    background: transparent;
+  }
+  .nav-pill:hover { color: var(--text); border-color: rgba(255,255,255,.15); }
+  .nav-pill.active { color: var(--cyan); border-color: rgba(0,255,255,.35); background: rgba(0,255,255,.07); }
+  .nav-pill.play {
+    background: rgba(0,255,255,.1); color: var(--cyan);
+    border-color: rgba(0,255,255,.4);
+  }
+  .nav-pill.play:hover { background: rgba(0,255,255,.18); box-shadow: 0 0 16px rgba(0,255,255,.2); }
+
+  /* ── Live indicator ─────────────────────────── */
+  .live-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+    color: var(--green); text-transform: uppercase;
+    background: rgba(57,255,94,.08); border: 1px solid rgba(57,255,94,.25);
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+  /* ── Page wrapper ────────────────────────────── */
+  .page { max-width: 1080px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  /* ── Page title ─────────────────────────────── */
+  .page-title {
+    font-family: 'Zolla', sans-serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900;
+    text-align: center;
+    background: linear-gradient(135deg, #fff 20%, #00ffff 55%, #ccff00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(0,255,255,.3));
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .page-sub {
+    text-align: center; font-size: 13px; color: var(--muted);
+    margin-bottom: 36px; letter-spacing: .6px;
+  }
+
+  /* ── Stats Row ───────────────────────────────── */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 36px; }
+  @media(max-width:640px){ .stats-row{ grid-template-columns: repeat(2,1fr); } }
+
+  .stat-card {
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px; position: relative; overflow: hidden;
+    transition: border-color .2s;
+  }
+  .stat-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,255,255,.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-icon { font-size: 20px; margin-bottom: 8px; }
+  .stat-val {
+    font-size: 28px; font-weight: 900; color: var(--cyan);
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 12px rgba(0,255,255,.4);
+  }
+  .stat-val.lime { color: var(--lime); text-shadow: 0 0 12px rgba(204,255,0,.4); }
+  .stat-val.gold { color: var(--gold); text-shadow: 0 0 12px rgba(255,215,0,.4); }
+  .stat-val.green{ color: var(--green);text-shadow: 0 0 12px rgba(57,255,94,.4); }
+  .stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ── Podium ──────────────────────────────────── */
+  .podium-section { margin-bottom: 36px; }
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 14px; }
+
+  .podium-slot {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    flex: 1; max-width: 220px;
+  }
+  .podium-slot.first  { order: 2; }
+  .podium-slot.second { order: 1; }
+  .podium-slot.third  { order: 3; }
+
+  .podium-card {
+    width: 100%; border-radius: 12px; padding: 18px 14px;
+    text-align: center; border: 1px solid transparent; position: relative;
+    overflow: hidden; transition: transform .2s;
+  }
+  .podium-card:hover { transform: translateY(-4px); }
+
+  .podium-slot.first .podium-card {
+    background: linear-gradient(160deg, rgba(255,215,0,.08) 0%, rgba(255,215,0,.02) 100%);
+    border-color: rgba(255,215,0,.4);
+    box-shadow: 0 0 30px rgba(255,215,0,.15);
+  }
+  .podium-slot.second .podium-card {
+    background: linear-gradient(160deg, rgba(192,192,192,.08) 0%, rgba(192,192,192,.02) 100%);
+    border-color: rgba(192,192,192,.35);
+  }
+  .podium-slot.third .podium-card {
+    background: linear-gradient(160deg, rgba(205,127,50,.08) 0%, rgba(205,127,50,.02) 100%);
+    border-color: rgba(205,127,50,.35);
+  }
+
+  .podium-medal { font-size: 32px; margin-bottom: 6px; display: block; }
+  .podium-rank  { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; }
+  .podium-word  {
+    font-size: 15px; font-weight: 900; color: var(--cyan); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 3px;
+    text-shadow: 0 0 10px rgba(0,255,255,.4);
+  }
+  .podium-slot.first .podium-word { font-size: 18px; }
+  .podium-meta  { font-size: 10px; color: var(--muted); margin-bottom: 10px; text-transform: capitalize; }
+  .podium-score {
+    font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 900;
+  }
+  .podium-slot.first  .podium-score { color: var(--gold);   font-size: 28px; text-shadow: 0 0 16px rgba(255,215,0,.5); }
+  .podium-slot.second .podium-score { color: var(--silver); text-shadow: 0 0 12px rgba(192,192,192,.4); }
+  .podium-slot.third  .podium-score { color: var(--bronze); text-shadow: 0 0 12px rgba(205,127,50,.4); }
+
+  .podium-base {
+    width: 100%; border-radius: 0 0 6px 6px; padding: 10px 0;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-align: center;
+    text-transform: uppercase;
+  }
+  .podium-slot.first  .podium-base { background: rgba(255,215,0,.12); color: var(--gold); height: 70px; display:flex;align-items:center;justify-content:center; }
+  .podium-slot.second .podium-base { background: rgba(192,192,192,.08); color: var(--silver); height: 50px; display:flex;align-items:center;justify-content:center; }
+  .podium-slot.third  .podium-base { background: rgba(205,127,50,.08); color: var(--bronze); height: 36px; display:flex;align-items:center;justify-content:center; }
+
+  /* ── Filters ─────────────────────────────────── */
+  .filters-bar {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;
+    align-items: center;
+  }
+  .filter-group { display: flex; gap: 6px; }
+  .filter-sep { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
+
+  .ftag {
+    padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    letter-spacing: .8px; text-transform: uppercase; cursor: pointer;
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+    transition: all .18s;
+  }
+  .ftag:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+  .ftag.active { color: var(--cyan); border-color: rgba(0,255,255,.45); background: rgba(0,255,255,.07); }
+  .ftag.easy.active   { color: var(--green);  border-color: rgba(57,255,94,.45);  background: rgba(57,255,94,.07); }
+  .ftag.medium.active { color: var(--orange); border-color: rgba(255,140,0,.45);  background: rgba(255,140,0,.07); }
+  .ftag.hard.active   { color: var(--red);    border-color: rgba(255,68,68,.45);  background: rgba(255,68,68,.07); }
+
+  .results-count { margin-left: auto; font-size: 11px; color: var(--muted); }
+
+  /* ── Table ───────────────────────────────────── */
+  .table-wrap {
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+
+  .lb-table { width: 100%; border-collapse: collapse; }
+
+  .lb-table thead tr {
+    background: var(--surf2);
+    border-bottom: 1px solid var(--border);
+  }
+  .lb-table thead th {
+    padding: 14px 16px; text-align: left; font-size: 10px;
+    font-weight: 700; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; white-space: nowrap;
+  }
+  .lb-table thead th:last-child { text-align: right; }
+
+  .lb-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    transition: background .15s;
+    animation: row-in .3s ease both;
+  }
+  @keyframes row-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .lb-table tbody tr:hover { background: rgba(255,255,255,.03); }
+  .lb-table tbody tr:last-child { border-bottom: none; }
+
+  .lb-table td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
+  .lb-table td:last-child { text-align: right; }
+
+  /* rank cell */
+  .rank-medal { font-size: 20px; }
+  .rank-num {
+    display: inline-flex; align-items:center; justify-content:center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surf3); color: var(--muted);
+    font-size: 12px; font-weight: 700;
+  }
+
+  /* word cell */
+  .word-cell { font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: .08em; font-size: 14px; }
+
+  /* tags */
+  .cat-tag {
+    display: inline-block; padding: 2px 9px; border-radius: 4px; font-size: 10px; font-weight: 700;
+    background: rgba(0,255,255,.08); color: var(--cyan);
+    border: 1px solid rgba(0,255,255,.2); text-transform: capitalize; letter-spacing: .5px;
+  }
+  .diff-pip {
+    display: inline-block; padding: 2px 9px; border-radius: 4px; font-size: 10px; font-weight: 700;
+    text-transform: capitalize; letter-spacing: .5px;
+  }
+  .diff-pip.easy   { background: rgba(57,255,94,.08);  color: var(--green);  border:1px solid rgba(57,255,94,.25); }
+  .diff-pip.medium { background: rgba(255,140,0,.08);  color: var(--orange); border:1px solid rgba(255,140,0,.25); }
+  .diff-pip.hard   { background: rgba(255,68,68,.08);  color: var(--red);    border:1px solid rgba(255,68,68,.25); }
+
+  /* score cell */
+  .score-cell {
+    font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 900;
+    color: var(--lime); text-shadow: 0 0 10px rgba(204,255,0,.35);
+  }
+  .score-cell.gold   { color: var(--gold);   text-shadow: 0 0 12px rgba(255,215,0,.5); }
+  .score-cell.silver { color: var(--silver); text-shadow: 0 0 10px rgba(192,192,192,.4); }
+  .score-cell.bronze { color: var(--bronze); text-shadow: 0 0 10px rgba(205,127,50,.4); }
+
+  /* date cell */
+  .date-cell { color: var(--muted); font-size: 11px; }
+
+  /* time-ago */
+  .time-ago { font-size: 10px; color: #444; display: block; margin-top: 1px; }
+
+  /* ── Player cell ────────────────────────── */
+  .player-cell { display:flex; align-items:center; gap:10px; }
+  .p-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, #00ffff, #ccff00);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 900; color: #000;
+    font-family: 'Orbitron', monospace;
+  }
+  .p-avatar.anon { background: linear-gradient(135deg,#333,#555); color: #888; }
+  .p-name  { font-weight: 800; font-size: 14px; color: var(--text); letter-spacing: .03em; }
+  .p-plan  {
+    font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 99px;
+    text-transform: uppercase; letter-spacing: .06em; display: inline-block; margin-top: 2px;
+  }
+  .p-plan.free    { background: rgba(0,255,255,.1); color: var(--cyan); border: 1px solid rgba(0,255,255,.2); }
+  .p-plan.premium { background: rgba(204,255,0,.12);color: var(--lime); border: 1px solid rgba(204,255,0,.25); }
+  .p-plan.guest   { background: rgba(255,255,255,.05);color: var(--muted); border: 1px solid rgba(255,255,255,.1); }
+
+  /* ── Expandable row ─────────────────────── */
+  .expand-row td { padding: 0 !important; }
+  .expand-inner {
+    overflow: hidden; transition: max-height .35s ease, padding .3s ease;
+    max-height: 0; background: var(--surf2);
+  }
+  .expand-inner.open { max-height: 500px; padding: 14px 16px; }
+  .exp-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 10px;
+  }
+  .exp-item {
+    background: var(--surf3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .exp-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .exp-val  {
+    font-family: 'Orbitron', monospace; font-size: .95rem;
+    font-weight: 700; color: var(--cyan); line-height: 1;
+  }
+  .exp-lbl  { font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+  .exp-game-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .exp-game-pill {
+    font-size: .7rem; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  tr.main-row { cursor: pointer; }
+  tr.main-row:hover td { background: rgba(0,255,255,.04) !important; }
+  .chevron { font-size: .65rem; color: var(--muted); margin-left: auto; transition: transform .25s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* ── Stat card tweak — show player count ─ */
+  #st-players { font-family:'Orbitron',monospace; }
+
+  /* ── Responsive hide cols ───────────────── */
+  @media(max-width:700px){
+    .col-best, .lb-table th.col-best { display:none; }
+    .col-last, .lb-table th.col-last { display:none; }
+  }
+  @media(max-width:500px){
+    .col-games, .lb-table th.col-games { display:none; }
+    .col-fav,   .lb-table th.col-fav   { display:none; }
+  }
+
+  /* empty state */
+  .empty-state {
+    padding: 60px 20px; text-align: center; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .empty-state .emoji { font-size: 48px; }
+  .empty-state h3 { font-size: 18px; color: var(--text); }
+  .empty-state p  { font-size: 13px; max-width: 320px; line-height: 1.6; }
+  .empty-state .play-link {
+    margin-top: 8px; padding: 10px 24px; border-radius: 8px;
+    background: rgba(0,255,255,.08); color: var(--cyan);
+    border: 1px solid rgba(0,255,255,.3); font-size: 13px; font-weight: 700;
+    transition: all .2s; display: inline-block;
+  }
+  .empty-state .play-link:hover { background: rgba(0,255,255,.15); }
+
+  /* ── Refresh bar ─────────────────────────────── */
+  .refresh-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; background: var(--surf2);
+    border-top: 1px solid var(--border); font-size: 11px; color: var(--muted);
+  }
+  .refresh-bar .next { color: var(--cyan); font-weight: 700; }
+  .refresh-bar button {
+    margin-left: auto; padding: 4px 12px; border-radius: 4px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-size: 11px; cursor: pointer; transition: all .18s;
+  }
+  .refresh-bar button:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* ── Clear button ────────────────────────────── */
+  .clear-btn {
+    display: block; margin: 20px auto 0; padding: 8px 20px; border-radius: 6px;
+    background: transparent; border: 1px solid rgba(255,68,68,.3);
+    color: rgba(255,68,68,.6); font-size: 11px; font-weight: 700; cursor: pointer;
+    transition: all .2s; letter-spacing: .6px;
+  }
+  .clear-btn:hover { border-color: var(--red); color: var(--red); background: rgba(255,68,68,.06); }
+
+  /* ── Toast ───────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: var(--surf2); border: 1px solid rgba(0,255,255,.3);
+    color: var(--text); padding: 12px 20px; border-radius: 8px;
+    font-size: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    transform: translateX(120%); transition: transform .3s cubic-bezier(.175,.885,.32,1.275);
+  }
+  .toast.show { transform: translateX(0); }
+
+  /* ── Number font override — Zolla does not render digits ── */
+  /* Every element that shows a number gets Orbitron explicitly */
+  .num,
+  .stat-val,
+  .score-cell,
+  .podium-score,
+  .rank-num,
+  .timer-count,
+  .refresh-bar .next,
+  .results-count,
+  .page-sub,
+  .time-ago,
+  .date-cell { font-family: 'Orbitron', 'Share Tech Mono', monospace; }
+
+  /* Override back for non-numeric labels that inherited monospace */
+  .stat-lbl, .podium-rank, .podium-meta, .podium-word,
+  .section-label, .empty-state p, .empty-state h3,
+  .filter-group .ftag { font-family: 'Zolla', 'Open Sans', sans-serif; }
+
+  /* ── Game Tabs ──────────────────────────────── */
+  .game-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+  .game-tab {
+    font-family: 'Orbitron', monospace;
+    font-size: .62rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 18px; border-radius: 8px; cursor: pointer;
+    background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border); transition: all .2s;
+    white-space: nowrap;
+  }
+  .game-tab:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+  .game-tab.active-hangman { background: rgba(0,255,255,.1);   color: var(--cyan);   border-color: rgba(0,255,255,.45); }
+  .game-tab.active-ttt     { background: rgba(204,255,0,.1);   color: var(--lime);   border-color: rgba(204,255,0,.4);  }
+  .game-tab.active-syntax  { background: rgba(180,126,255,.1); color: #b47eff;       border-color: rgba(180,126,255,.4); }
+  .game-tab.active-oracle  { background: rgba(255,140,0,.1);   color: var(--orange); border-color: rgba(255,140,0,.4);  }
+  .game-tab.active-all     { background: rgba(57,255,94,.1);   color: var(--green);  border-color: rgba(57,255,94,.4);  }
+
+  /* ── Game source badge in table ────────────────── */
+  .game-src {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .6px; white-space: nowrap;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .game-src.hangman { background: rgba(0,255,255,.08);   color: var(--cyan);   border: 1px solid rgba(0,255,255,.2); }
+  .game-src.ttt     { background: rgba(204,255,0,.08);   color: var(--lime);   border: 1px solid rgba(204,255,0,.2); }
+  .game-src.syntax  { background: rgba(180,126,255,.08); color: #b47eff;       border: 1px solid rgba(180,126,255,.2); }
+  .game-src.oracle  { background: rgba(255,140,0,.08);   color: var(--orange); border: 1px solid rgba(255,140,0,.2); }
+
+  /* ── Responsive ──────────────────────────────── */
+  @media(max-width:700px) {
+    .site-header { padding: 0 16px; }
+    .page { padding: 24px 12px 60px; }
+    .podium { gap: 8px; }
+    .lb-table td:nth-child(4),
+    .lb-table th:nth-child(4) { display: none; } /* hide date on mobile */
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+  }
+  @media(max-width:480px) {
+    .lb-table td:nth-child(3),
+    .lb-table th:nth-child(3) { display: none; } /* hide category on tiny */
+  }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="site-header">
+    <h1 class="logo-text">
+      <a href="index.html" style="text-decoration:none">
+        <span class="code">Code</span><span class="arena">Arena</span>
+      </a>
+    </h1>
+    <nav class="header-nav">
+      <span class="live-chip"><span class="live-dot"></span> Live</span>
+      <a href="index.html"          class="nav-pill">Home</a>
+      <a href="hangmanPage/hangman.html" class="nav-pill play">▶ Play Hangman</a>
+      <a href="GameBuilder/gamebuilder.html" class="nav-pill">Studio</a>
+    </nav>
+  </header>
+
+  <!-- ═══ PAGE ═══ -->
+  <div class="page">
+
+    <h1 class="page-title">🏆 Leaderboard</h1>
+    <p class="page-sub" id="page-sub">Loading scores…</p>
+
+    <!-- Stats Row -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">👾</div>
+        <div class="stat-val" id="st-games" style="font-family:'Orbitron',monospace">—</div>
+        <div class="stat-lbl">Total Players</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🥇</div>
+        <div class="stat-val gold" id="st-top">—</div>
+        <div class="stat-lbl">Highest Total Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-val lime" id="st-avg">—</div>
+        <div class="stat-lbl">Avg Score / Player</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-val green" id="st-cat">—</div>
+        <div class="stat-lbl">Most Active Player</div>
+      </div>
+    </div>
+
+    <!-- Podium -->
+    <div class="podium-section" id="podium-section">
+      <div class="section-label">Top Players</div>
+      <div class="podium" id="podium"></div>
+    </div>
+
+    <!-- Game Tabs -->
+    <div class="game-tabs">
+      <button class="game-tab active-all"     id="gtab-all"    onclick="switchGame('all')">   🌐 All Games</button>
+      <button class="game-tab"                id="gtab-hangman" onclick="switchGame('hangman')">⌨ Hangman</button>
+      <button class="game-tab"                id="gtab-ttt"     onclick="switchGame('ttt')">   ⊞ Tic Tac Toe</button>
+      <button class="game-tab"                id="gtab-syntax"  onclick="switchGame('syntax')"> 🖥 Predict Output</button>
+      <button class="game-tab"                id="gtab-oracle"  onclick="switchGame('oracle')"> 🔮 Output Oracle</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-group" id="cat-filters">
+        <button class="ftag active" data-cat="all">All</button>
+        <button class="ftag" data-cat="html">HTML</button>
+        <button class="ftag" data-cat="css">CSS</button>
+        <button class="ftag" data-cat="javascript">JS</button>
+        <button class="ftag" data-cat="python">Python</button>
+        <button class="ftag" data-cat="cpp">C++</button>
+        <button class="ftag" data-cat="flex">Flex</button>
+        <button class="ftag" data-cat="grid">Grid</button>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group" id="diff-filters">
+        <button class="ftag active" data-diff="all">All</button>
+        <button class="ftag easy"   data-diff="easy">Easy</button>
+        <button class="ftag medium" data-diff="medium">Medium</button>
+        <button class="ftag hard"   data-diff="hard">Hard</button>
+      </div>
+      <span class="results-count" id="results-count"></span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th style="width:52px">Rank</th>
+            <th>Player</th>
+            <th class="col-games">Games</th>
+            <th class="col-best">Best</th>
+            <th class="col-fav">Top Game</th>
+            <th class="col-last">Last Played</th>
+            <th style="text-align:right">Total Score</th>
+          </tr>
+        </thead>
+        <tbody id="lb-body"></tbody>
+      </table>
+      <div id="empty-state" class="empty-state" style="display:none">
+        <div class="emoji">🎮</div>
+        <h3>No scores yet!</h3>
+        <p>Win a Tic Tac Toe game to appear on the leaderboard. The harder the difficulty, the higher the score.</p>
+        <a href="Tictactoe/index.html" class="play-link">▶ Play Tic Tac Toe Now</a>
+      </div>
+      <div class="refresh-bar">
+        <span>🔄 Auto-refresh in <span class="next" id="next-refresh">10s</span></span>
+        <button id="btn-refresh">Refresh Now</button>
+      </div>
+    </div>
+
+    <button class="clear-btn" id="btn-clear">🗑 Clear All Scores</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   STORAGE KEYS
+══════════════════════════════════════════════ */
+const LS_SHARED = 'codearena_hangman_scores';
+const LS_TTT    = 'codearena_ttt_scores';
+const AUTH_KEY  = 'codearena_user';
+const ACCOUNTS_KEY = 'ca_accounts';
+
+/* ── Game tab state ── */
+let activeGame = 'all';
+let activeDiff = 'all';
+
+/* ── Label maps ── */
+const GAME_LABEL = { hangman:'Hangman', ttt:'Tic Tac Toe', syntax:'Predict Output', oracle:'Output Oracle' };
+const GAME_CLASS = { hangman:'hangman', ttt:'ttt', syntax:'syntax', oracle:'oracle' };
+const GAME_ICON  = { hangman:'⌨', ttt:'⊞', syntax:'🖥', oracle:'🔮' };
+
+/* ─────────────────────────────────────────────
+   RAW DATA LOAD + TAG
+───────────────────────────────────────────── */
+function tagGame(entry) {
+  const g = (entry.game || '').toLowerCase();
+  if (g === 'syntax')                   return { ...entry, _game:'syntax' };
+  if (g === 'oracle' || g === 'mcq')    return { ...entry, _game:'oracle' };
+  if (g === 'ttt' || g === 'tictactoe') return { ...entry, _game:'ttt' };
+  return { ...entry, _game:'hangman' };
+}
+
+function loadAllEntries() {
+  const shared = (() => { try { return JSON.parse(localStorage.getItem(LS_SHARED)||'[]'); } catch{return[];} })();
+  const ttt    = (() => { try { return JSON.parse(localStorage.getItem(LS_TTT)||'[]');    } catch{return[];} })();
+  return [
+    ...shared.map(tagGame),
+    ...ttt.map(e => ({ ...e, _game:'ttt' }))
+  ];
+}
+
+/* ─────────────────────────────────────────────
+   AGGREGATE ENTRIES → PLAYER ROWS
+   Each entry should have a `player` field (set
+   when a logged-in user plays). Entries without
+   one are grouped under "Anonymous".
+───────────────────────────────────────────── */
+function buildPlayerRows(entries) {
+  const map = {};   // key: player name → aggregated data
+
+  entries.forEach(e => {
+    const name = (e.player || 'Anonymous').trim();
+    if (!map[name]) {
+      map[name] = {
+        player:    name,
+        total:     0,
+        games:     0,
+        best:      0,
+        bestGame:  '',
+        gameCount: {},        // { hangman: 3, syntax: 2 }
+        lastIso:   null,
+        lastDate:  '—',
+      };
+    }
+    const r = map[name];
+    r.total += (e.score || 0);
+    r.games++;
+    if ((e.score || 0) > r.best) {
+      r.best = e.score;
+      r.bestGame = e._game;
+    }
+    r.gameCount[e._game] = (r.gameCount[e._game] || 0) + 1;
+    if (e.isoDate && (!r.lastIso || e.isoDate > r.lastIso)) {
+      r.lastIso  = e.isoDate;
+      r.lastDate = e.date || '—';
+    }
+  });
+
+  // Compute favourite game per player
+  Object.values(map).forEach(r => {
+    const fav = Object.entries(r.gameCount).sort((a,b)=>b[1]-a[1])[0];
+    r.favGame = fav ? fav[0] : '—';
+  });
+
+  // Sort by total score descending
+  return Object.values(map).sort((a,b) => b.total - a.total);
+}
+
+/* ─────────────────────────────────────────────
+   FILTER ENTRIES BY ACTIVE GAME / DIFF
+───────────────────────────────────────────── */
+function filteredEntries() {
+  return loadAllEntries().filter(e => {
+    const gameOk = activeGame === 'all' || e._game === activeGame;
+    const diffOk = activeDiff === 'all' || (e.difficulty || '') === activeDiff;
+    return gameOk && diffOk;
+  });
+}
+
+/* ─────────────────────────────────────────────
+   LOOK UP PLAYER'S PLAN FROM ca_accounts
+───────────────────────────────────────────── */
+function playerPlan(playerName) {
+  try {
+    const accs = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '{}');
+    // match by name (accounts keyed by email — search values)
+    const entry = Object.values(accs).find(a => a.name === playerName);
+    return entry?.plan || 'guest';
+  } catch { return 'guest'; }
+}
+
+/* ─────────────────────────────────────────────
+   STATS
+───────────────────────────────────────────── */
+function updateStats(playerRows) {
+  const n = playerRows.length;
+  document.getElementById('st-games').textContent = n || '—';
+
+  if (!n) {
+    ['st-top','st-avg','st-cat'].forEach(id => document.getElementById(id).textContent = '—');
+    document.getElementById('page-sub').textContent = 'No scores yet. Play a game to appear here!';
+    return;
+  }
+
+  const top = Math.max(...playerRows.map(r => r.total));
+  const avg = Math.round(playerRows.reduce((a,r) => a + r.total, 0) / n);
+  const most = playerRows.reduce((a,b) => b.games > a.games ? b : a);
+
+  document.getElementById('st-top').textContent = top;
+  document.getElementById('st-avg').textContent = avg;
+  document.getElementById('st-cat').textContent = most.player.length > 10
+    ? most.player.slice(0,9)+'…' : most.player;
+
+  // page sub — find most recent date
+  const newest = filteredEntries().filter(e=>e.isoDate).sort((a,b)=>b.isoDate>a.isoDate?1:-1)[0];
+  const ts = newest?.isoDate ? timeAgo(newest.isoDate) : 'recently';
+  document.getElementById('page-sub').textContent =
+    `${n} player${n!==1?'s':''} · ${playerRows.reduce((a,r)=>a+r.games,0)} rounds played · Last active ${ts}`;
+}
+
+/* ─────────────────────────────────────────────
+   PODIUM — top 3 PLAYERS
+───────────────────────────────────────────── */
+function renderPodium(playerRows) {
+  const section = document.getElementById('podium-section');
+  const podium  = document.getElementById('podium');
+  const top3    = playerRows.slice(0, 3);
+
+  if (!top3.length) { section.style.display='none'; return; }
+  section.style.display = '';
+
+  const classes = ['first','second','third'];
+  const medals  = ['🥇','🥈','🥉'];
+  const labels  = ['1st Place','2nd Place','3rd Place'];
+
+  podium.innerHTML = top3.map((r,i) => {
+    const initials = r.player.slice(0,2).toUpperCase();
+    const plan     = playerPlan(r.player);
+    const planLabel= plan === 'premium' ? '★ PREMIUM' : plan === 'guest' ? 'GUEST' : 'FREE';
+    const planStyle= plan === 'premium'
+      ? 'background:rgba(204,255,0,.15);color:#ccff00;border:1px solid rgba(204,255,0,.3)'
+      : 'background:rgba(255,255,255,.06);color:#6b7280;border:1px solid rgba(255,255,255,.1)';
+    const favIcon  = GAME_ICON[r.favGame] || '🎮';
+
+    return `
+    <div class="podium-slot ${classes[i]}">
+      <div class="podium-card">
+        <span class="podium-medal">${medals[i]}</span>
+        <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#00ffff,#ccff00);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#000;margin:6px auto 10px">${initials}</div>
+        <div class="podium-word" style="font-size:${i===0?'1.1rem':'1rem'}">${escHtml(r.player)}</div>
+        <div style="margin:4px auto 8px"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;${planStyle};text-transform:uppercase;letter-spacing:.06em">${planLabel}</span></div>
+        <div class="podium-meta">${favIcon} ${escHtml(GAME_LABEL[r.favGame]||'—')} · ${r.games} rounds</div>
+        <div class="podium-score num">${r.total}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:'Orbitron',monospace">TOTAL PTS</div>
+      </div>
+      <div class="podium-base">${labels[i].toUpperCase()}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─────────────────────────────────────────────
+   TABLE — one row per player, expandable
+───────────────────────────────────────────── */
+let expandedPlayer = null;   // track which row is open
+
+function renderTable(playerRows) {
+  const tbody = document.getElementById('lb-body');
+  const empty = document.getElementById('empty-state');
+  const count = document.getElementById('results-count');
+
+  count.textContent = playerRows.length
+    ? `${playerRows.length} player${playerRows.length!==1?'s':''}`
+    : '';
+
+  if (!playerRows.length) { tbody.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display = 'none';
+
+  const rows = playerRows.map((r,i) => {
+    const rankHtml = i===0 ? `<span class="rank-medal">🥇</span>`
+                   : i===1 ? `<span class="rank-medal">🥈</span>`
+                   : i===2 ? `<span class="rank-medal">🥉</span>`
+                   : `<span class="rank-num num">#${i+1}</span>`;
+
+    const scoreClass = i===0?'gold': i===1?'silver': i===2?'bronze':'';
+    const initials   = r.player.slice(0,2).toUpperCase();
+    const isAnon     = r.player === 'Anonymous';
+    const plan       = playerPlan(r.player);
+    const planLabel  = plan === 'premium' ? '★ Premium' : plan === 'free' ? 'Free' : 'Guest';
+    const favIcon    = GAME_ICON[r.favGame] || '🎮';
+    const ago        = r.lastIso ? `<span class="time-ago num">${timeAgo(r.lastIso)}</span>` : '';
+    const pid        = 'player-' + i;
+
+    // Build expand content
+    const gamesDetail = Object.entries(r.gameCount)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([g,c]) => `<span class="exp-game-pill game-src ${GAME_CLASS[g]}">${GAME_ICON[g]} ${GAME_LABEL[g]||g} &nbsp;×${c}</span>`)
+      .join('');
+
+    const expandHTML = `
+      <tr class="expand-row" id="exp-${pid}">
+        <td colspan="7">
+          <div class="expand-inner" id="inner-${pid}">
+            <div class="exp-grid">
+              <div class="exp-item">
+                <div class="exp-icon">🎯</div>
+                <div><div class="exp-val num">${r.best}</div><div class="exp-lbl">Best Single Score</div></div>
+              </div>
+              <div class="exp-item">
+                <div class="exp-icon">🎮</div>
+                <div><div class="exp-val num">${r.games}</div><div class="exp-lbl">Total Rounds</div></div>
+              </div>
+              <div class="exp-item">
+                <div class="exp-icon">⚡</div>
+                <div><div class="exp-val num">${Math.round(r.total / r.games)}</div><div class="exp-lbl">Avg Score / Round</div></div>
+              </div>
+              <div class="exp-item">
+                <div class="exp-icon">📅</div>
+                <div><div class="exp-val" style="font-size:.8rem">${r.lastDate}</div><div class="exp-lbl">Last Played</div></div>
+              </div>
+            </div>
+            <div class="exp-game-list">${gamesDetail}</div>
+          </div>
+        </td>
+      </tr>`;
+
+    return `
+      <tr class="main-row" data-pid="${pid}" style="animation-delay:${Math.min(i*30,300)}ms">
+        <td>${rankHtml}</td>
+        <td>
+          <div class="player-cell">
+            <div class="p-avatar ${isAnon?'anon':''}">${initials}</div>
+            <div>
+              <div class="p-name">${escHtml(r.player)}</div>
+              <span class="p-plan ${plan}">${planLabel}</span>
+            </div>
+            <span class="chevron" id="chev-${pid}">▼</span>
+          </div>
+        </td>
+        <td class="col-games num" style="color:var(--muted);font-size:13px">${r.games}</td>
+        <td class="col-best score-cell num" style="font-size:13px">${r.best}</td>
+        <td class="col-fav" style="font-size:12px">${favIcon} <span style="color:var(--muted)">${escHtml(GAME_LABEL[r.favGame]||'—')}</span></td>
+        <td class="col-last date-cell num">${r.lastDate}${ago}</td>
+        <td class="score-cell num ${scoreClass}">${r.total}</td>
+      </tr>
+      ${expandHTML}`;
+  }).join('');
+
+  tbody.innerHTML = rows;
+
+  // Wire click-to-expand
+  tbody.querySelectorAll('.main-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const pid   = row.dataset.pid;
+      const inner = document.getElementById('inner-' + pid);
+      const chev  = document.getElementById('chev-' + pid);
+      const isOpen = inner.classList.contains('open');
+
+      // Close any other open row
+      tbody.querySelectorAll('.expand-inner.open').forEach(el => el.classList.remove('open'));
+      tbody.querySelectorAll('.chevron.open').forEach(el => el.classList.remove('open'));
+
+      if (!isOpen) {
+        inner.classList.add('open');
+        chev.classList.add('open');
+      }
+    });
+  });
+}
+
+/* ─────────────────────────────────────────────
+   FULL RENDER
+───────────────────────────────────────────── */
+function render() {
+  const entries = filteredEntries();
+  const players = buildPlayerRows(entries);
+  updateStats(players);
+  renderPodium(players);
+  renderTable(players);
+}
+
+/* ─────────────────────────────────────────────
+   SWITCH GAME TAB
+───────────────────────────────────────────── */
+function switchGame(game) {
+  activeGame = game;
+  activeDiff = 'all';
+  document.querySelectorAll('#diff-filters .ftag').forEach(b => b.classList.toggle('active', b.dataset.diff==='all'));
+  const TAB_GAMES = ['all','hangman','ttt','syntax','oracle'];
+  TAB_GAMES.forEach(g => {
+    const el = document.getElementById('gtab-'+g);
+    if (el) el.className = 'game-tab' + (g===game?' active-'+g:'');
+  });
+  updateCatFilterVisibility(game);
+  updateEmptyState(game);
+  render();
+}
+
+function updateCatFilterVisibility(game) {
+  // category filters are repurposed as difficulty only now — keep bar but simplify
+  // (cat filter removed from layout above; kept for backward compat — just hide it)
+  document.getElementById('cat-filters').style.display = 'none';
+}
+
+function updateEmptyState(game) {
+  const routes = {
+    all:    { href:'hangmanPage/hangman.html',  text:'▶ Play a Game', h3:'No players yet!', p:'Complete any game to appear on the leaderboard.' },
+    hangman:{ href:'hangmanPage/hangman.html',  text:'▶ Play Hangman', h3:'No Hangman players yet!', p:'Win a Hangman round to get ranked.' },
+    ttt:    { href:'Tictactoe/index.html',      text:'▶ Play Tic Tac Toe', h3:'No Tic Tac Toe players yet!', p:'Win a round to get ranked.' },
+    syntax: { href:'syntaxPage/syntax.html',    text:'▶ Play Predict Output', h3:'No Predict Output players yet!', p:'Complete a round to get ranked.' },
+    oracle: { href:'oraclePage/mcq.html',       text:'▶ Play Output Oracle', h3:'No Output Oracle players yet!', p:'Complete a round to get ranked.' },
+  };
+  const r = routes[game] || routes.all;
+  const h3   = document.querySelector('#empty-state h3');
+  const p    = document.querySelector('#empty-state p');
+  const link = document.querySelector('#empty-state .play-link');
+  if (h3)   h3.textContent   = r.h3;
+  if (p)    p.textContent    = r.p;
+  if (link) { link.href = r.href; link.textContent = r.text; }
+}
+
+/* ─────────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────────── */
+function escHtml(s) {
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const s = Math.floor(diff/1000);
+  if (s < 60) return 'just now';
+  const m = Math.floor(s/60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m/60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h/24)}d ago`;
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ─────────────────────────────────────────────
+   DIFF FILTER (cat filter hidden — player view)
+───────────────────────────────────────────── */
+document.getElementById('diff-filters').addEventListener('click', e => {
+  const btn = e.target.closest('.ftag');
+  if (!btn) return;
+  document.querySelectorAll('#diff-filters .ftag').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeDiff = btn.dataset.diff;
+  render();
+});
+
+/* ─────────────────────────────────────────────
+   AUTO-REFRESH
+───────────────────────────────────────────── */
+let countdown = 10;
+const nextEl  = document.getElementById('next-refresh');
+setInterval(() => {
+  countdown--;
+  nextEl.textContent = countdown+'s';
+  if (countdown <= 0) { countdown=10; render(); showToast('🔄 Leaderboard refreshed'); }
+}, 1000);
+document.getElementById('btn-refresh').addEventListener('click', () => {
+  countdown=10; nextEl.textContent='10s'; render(); showToast('✔ Refreshed!');
+});
+
+/* ─────────────────────────────────────────────
+   REAL-TIME
+───────────────────────────────────────────── */
+window.addEventListener('storage', e => {
+  if (e.key === LS_SHARED || e.key === LS_TTT) { render(); showToast('🎮 New score arrived!'); }
+});
+
+/* ─────────────────────────────────────────────
+   CLEAR
+───────────────────────────────────────────── */
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (activeGame === 'all') {
+    if (!confirm('Clear ALL scores from every game?')) return;
+    localStorage.removeItem(LS_SHARED); localStorage.removeItem(LS_TTT);
+    showToast('🗑 All scores cleared');
+  } else if (activeGame === 'ttt') {
+    if (!confirm('Clear all Tic Tac Toe scores?')) return;
+    localStorage.removeItem(LS_TTT); showToast('🗑 Tic Tac Toe scores cleared');
+  } else {
+    const label = GAME_LABEL[activeGame]||activeGame;
+    if (!confirm(`Clear all ${label} scores?`)) return;
+    const keep = (() => { try { return JSON.parse(localStorage.getItem(LS_SHARED)||'[]'); } catch{return[];} })()
+                 .filter(s => tagGame(s)._game !== activeGame);
+    localStorage.setItem(LS_SHARED, JSON.stringify(keep));
+    showToast(`🗑 ${label} scores cleared`);
+  }
+  render();
+});
+
+/* ─────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────── */
+switchGame('all');
+</script>
+
+</body>
+</html>

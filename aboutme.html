@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Ajit | Code Simplified</title>
+    <script src="../auth-widget.js" defer></script>
+    <script src="rocket-cursor.js" defer></script>
+
+    <style>
+        /* Define the true black theme palette */
+        :root {
+            --pure-black: #000000;
+            --bg-overlay: rgba(0, 0, 0, 0.7);
+            /* To make text readable over the video */
+            --card-bg: rgba(20, 20, 20, 0.8);
+            /* Slightly lighter dark for contrast */
+            --accent: #38bdf8;
+            /* Energetic blue */
+            --text-main: #f8fafc;
+            /* Near white */
+            --text-dim: #a1a1aa;
+            /* Muted gray */
+            --gradient: linear-gradient(135deg, #38bdf8 0%, #a78bfa 100%);
+            --border: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--pure-black);
+            /* Fallback color */
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- Video Background Styling --- */
+        .video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -2;
+            /* Puts video behind everything */
+            object-fit: cover;
+            /* Ensures video covers screen without stretching */
+        }
+
+        /* Dark overlay to ensure readability */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-overlay);
+            z-index: -1;
+            /* Between the video and the content */
+        }
+
+        /* --- Main Content Area --- */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            position: relative;
+            z-index: 1;
+            /* Ensures content is on top */
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin: 0.5rem 0;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            font-weight: 700;
+            border-left: 5px solid var(--accent);
+            padding-left: 1rem;
+        }
+
+        /* --- Content Blocks --- */
+        .content-block {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            margin-bottom: 4rem;
+            backdrop-filter: blur(5px);
+            /* Optional subtle blur effect */
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+        }
+
+        strong {
+            color: var(--text-main);
+        }
+
+        /* --- Tech Stack Table --- */
+        .tech-stack-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .tech-stack-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 1.1rem;
+        }
+
+        .category-name {
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            width: 30%;
+        }
+
+        /* --- WIP Section --- */
+        .wip-item {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .wip-item h3 {
+            color: var(--text-main);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            text-align: center;
+            margin-top: 6rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border);
+        }
+
+        blockquote {
+            font-size: 1.4rem;
+            color: var(--text-main);
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--gradient);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 3rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2.8rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .content-block {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ca-auth-target"></div>
+
+    <video autoplay loop muted playsinline class="video-background">
+        <source src="asteroid.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="video-overlay"></div>
+
+    <div class="container">
+        <header>
+            <p class="tagline">Where Code Meets Creativity</p>
+            <h1>Ajit</h1>
+            <p style="font-size: 1.3rem; color: var(--text-dim);">1st Year B.Tech CSE Student // Creator // Developer
+            </p>
+        </header>
+
+        <section class="content-block">
+            <h2>The Mission 🚀</h2>
+            <p>I’m on a journey to strip away the complexity of programming. The "stuffy" era of coding is over. My
+                goal? <strong>Break it down. Build it up. Make it stick.</strong> Whether it's through clean Django
+                backends or high-energy video edits, I'm here to make coding simpler for everyone.</p>
+        </section>
+
+        <section class="content-block">
+            <h2>My Tech Stack</h2>
+            <table class="tech-stack-table">
+                <tr>
+                    <td class="category-name">Languages</td>
+                    <td>Python // C++ // JavaScript</td>
+                </tr>
+                <tr>
+                    <td class="category-name">Web Tech</td>
+                    <td>HTML5 // CSS3 // Django // Web Design</td>
+                </tr>
+                <tr>
+                    <td class="category-name">Creative</td>
+                    <td>Video Editing // Content Strategy // Visual Storytelling</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="content-block">
+            <h2>Work In Progress 🚧</h2>
+            <div class="wip-item">
+                <h3>Road to GSoC 2026</h3>
+                <p>Actively contributing to open-source repositories and mastering the workflow for large-scale
+                    collaborative projects.</p>
+            </div>
+            <div class="wip-item">
+                <h3>The Creator's Lab</h3>
+                <p>Experimenting with fast-paced video edits for YouTube and Instagram to explain complex algorithms in
+                    under 60 seconds.</p>
+            </div>
+            <div class="wip-item">
+                <h3>Simplifying the Web</h3>
+                <p>Building functional web applications (like my recent Zomato clone) to showcase clean, intuitive UI/UX
+                    design.</p>
+            </div>
+        </section>
+
+        <div class="footer">
+            <blockquote>"If you can't explain it simply, you don't understand it well enough."</blockquote>
+            <br>
+            <a href="#" class="btn">View My Portfolio</a>
+            <p style="margin-top: 3rem; color: var(--text-dim); font-size: 0.9rem;">LET'S BUILD SOMETHING GREAT.</p>
+        </div>
+    </div>
+
+</body>
+
+</html>

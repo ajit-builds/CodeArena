@@ -2,76 +2,150 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hangman</title>
-    <link rel="stylesheet" href="hangman.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeArena – Hangman</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="hangman.css">
+  <script src="hangman.js" defer></script>
+  <script src="../auth-widget.js" defer></script>
+      <script src="../rocket-cursor.js" defer></script>
+
+
 </head>
 
 <body>
-    <div class="game-modal">
-        <div class="content">
-            <img src="images/lost.gif" alt="gif">
-            <h1>Game Over!</h1>
-            <p>The correct word was: <b>rainbow</b>
-                <button class="play-again">Play Again</button>
-            </p>
-        </div>
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="site-header">
+    <h1 class="logo-text">
+      <a class="logo-link" href="../index.html">
+        <span class="code">Code</span><span class="arena">Arena</span>
+      </a>
+    </h1>
+    <div class="header-actions">
+      <a class="btn-lb nav-link" href="../Tictactoe/index.html">Tic Tac Toe</a>
+      <a class="btn-lb nav-link" href="../GameBuilder/gamebuilder.html">Game Builder</a>
+      <a class="btn-lb nav-link" href="../leaderboard.html">🏆 Leaderboard</a>
+      <div class="ca-auth-target"></div>  
     </div>
-    <div class="container">
-        <div class="hangman-box">
-            <img src="images/hangman-0.svg" alt="hangman img">
-            <h1>Hangman Game </h1>
-        </div>
-        <div class="game-box">
-            <ul class="word-display">
-                <li class="letter"></li>
-                <li class="letter"></li>
-                <li class="letter guessed">a</li>
-                <li class="letter"></li>
-                <li class="letter"></li>
-                <li class="letter"></li>
-                <li class="letter"></li>
-            </ul>
-            <h4 class="hint-text">
-                Hint:<b> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Recusandae sapiente quos, a quia
-                    animi, tenetur itaque voluptate, quasi veniam laborum tempore nihil id quo amet debitis ab iusto
-                    cumque totam.
-                </b>
-            </h4>
-            <h4 class="guesses-text">
-                Incorrect Guesses: <b>0/6</b>
-            </h4>
-            <div class="keyboard">
-                <button>a</button>
-                <button>b</button>
-                <button>c</button>
-                <button>d</button>
-                <button>e</button>
-                <button>f</button>
-                <button>g</button>
-                <button>h</button>
-                <button>i</button>
-                <button>j</button>
-                <button>k</button>
-                <button>l</button>
-                <button>m</button>
-                <button>n</button>
-                <button>o</button>
-                <button>p</button>
-                <button>q</button>
-                <button>r</button>
-                <button>s</button>
-                <button>t</button>
-                <button>u</button>
-                <button>v</button>
-                <button>w</button>
-                <button>x</button>
-                <button>y</button>
-                <button>z</button>
-            </div>
-        </div>
+  </header>
+
+  <!-- ═══ CONTROLS STRIP ═══ -->
+  <div class="controls-strip">
+    <div class="control-group">
+      <span class="control-label">📂 Category</span>
+      <div class="btn-row">
+        <button class="lang-btn" data-lang="html">HTML</button>
+        <button class="lang-btn" data-lang="css">CSS</button>
+        <button class="lang-btn" data-lang="javascript">JavaScript</button>
+        <button class="lang-btn" data-lang="cpp">C++</button>
+      </div>
     </div>
+    <div class="control-group">
+      <span class="control-label">⚡ Difficulty</span>
+      <div class="btn-row">
+        <button class="diff-btn" data-diff="easy">Easy · 120s</button>
+        <button class="diff-btn" data-diff="medium">Medium · 60s</button>
+        <button class="diff-btn" data-diff="hard">Hard · 30s</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TIMER BAR ═══ -->
+  <div class="timer-section">
+    <span class="timer-label">⏱ Time</span>
+    <div class="timer-bar-wrap">
+      <div class="timer-bar-fill" id="timerFill"></div>
+    </div>
+    <span class="timer-count" id="timerCount">—</span>
+  </div>
+
+  <!-- ═══ RESULT MODAL ═══ -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-box">
+      <div class="modal-emoji" id="modalEmoji">🎉</div>
+      <div class="modal-title win" id="modalTitle">You Won!</div>
+      <div class="modal-word-row">The word was: <b id="modalWord">—</b></div>
+      <div class="score-earned-block" id="scoreBlock">
+        <div class="se-row"><span>Base Score</span> <span id="seBase">0</span></div>
+        <div class="se-row"><span>Time Bonus</span> <span id="seTime">+0</span></div>
+        <div class="se-row"><span>Wrong Penalty</span> <span id="seWrong">-0</span></div>
+        <hr class="se-divider" />
+        <div class="se-total" id="seTotal">0 pts</div>
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-primary play-again-btn">▶ Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LEADERBOARD MODAL ═══ -->
+  <div class="modal-overlay" id="lbModal">
+    <div class="lb-modal-box">
+      <div class="lb-header">
+        <span class="lb-title">🏆 Leaderboard</span>
+        <button class="btn-close" id="lbClose">✕</button>
+      </div>
+      <div id="lbContent"></div>
+      <button class="lb-clear-btn" id="lbClearBtn">🗑 Clear All Scores</button>
+    </div>
+  </div>
+
+  <!-- ═══ GAME CONTAINER ═══ -->
+  <div class="container">
+
+    <!-- CANVAS + STATS SIDE -->
+    <div class="hangman-box">
+      <canvas id="hangmanCanvas" width="200" height="220"></canvas>
+      <div class="diff-badge" id="diffBadge">Easy</div>
+
+      <div class="score-display">
+        <div class="score-label">Session Score</div>
+        <div class="score-value" id="liveScore">0</div>
+      </div>
+      <div class="session-stats">
+        <div class="stat-chip">
+          <div class="s-label">Wins</div>
+          <div class="s-val" id="statWins">0</div>
+        </div>
+        <div class="stat-chip">
+          <div class="s-label">Streak</div>
+          <div class="s-val" id="statStreak">0</div>
+        </div>
+        <div class="stat-chip">
+          <div class="s-label">Best</div>
+          <div class="s-val" id="statBest">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME AREA -->
+    <div class="game-box">
+      <ul class="word-display" id="wordDisplay">
+        <li class="idle-prompt">← Pick a category &amp; difficulty to start!</li>
+      </ul>
+      <div class="info-row">
+        <h4 class="hint-text">Hint: <b id="hintVal">—</b></h4>
+        <h4 class="guesses-text">Wrong: <b id="guessesVal">0 / 6</b></h4>
+      </div>
+      <div class="keyboard" id="keyboard">
+        <button>a</button><button>b</button><button>c</button>
+        <button>d</button><button>e</button><button>f</button>
+        <button>g</button><button>h</button><button>i</button>
+        <button>j</button><button>k</button><button>l</button>
+        <button>m</button><button>n</button><button>o</button>
+        <button>p</button><button>q</button><button>r</button>
+        <button>s</button><button>t</button><button>u</button>
+        <button>v</button><button>w</button><button>x</button>
+        <button>y</button><button>z</button>
+      </div>
+    </div>
+  </div>
+
 
 </body>
 

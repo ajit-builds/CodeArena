@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Builder | CodeArena Studio</title>
+    <script src="../rocket-cursor.js" defer></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Oxanium:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <script defer src="builder-script.js"></script>
+    <link rel="stylesheet" href="builder-style.css">
+    <script src="../auth-widget.js" defer></script>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ══════════ TOP BAR ══════════ -->
+        <header class="topbar">
+            <a class="logo" href="../index.html"><span class="code">Code</span><span class="arena">Arena</span><span
+                    class="studio-badge">STUDIO</span></a>
+
+            <div class="topbar-center">
+                <span id="unsaved-dot" class="unsaved-dot"></span>
+                <input type="text" id="game-title" class="title-input" value="Untitled_Game_01" title="Click to rename">
+            </div>
+
+            <div class="topbar-right">
+                <a class="btn btn-ghost" href="../index.html">Home</a>
+                <a class="btn btn-ghost" href="../hangmanPage/hangman.html">Hangman</a>
+                <a class="btn btn-ghost" href="../Tictactoe/index.html">Tic Tac Toe</a>
+                <button class="btn btn-ghost" id="btn-preview-toggle" title="Toggle preview">⟵ Preview</button>
+                <button class="btn btn-run" id="btn-run">▶ Run</button>
+                <button class="btn btn-save" id="btn-save">⬡ Save Draft</button>
+                <button class="btn btn-publish" id="btn-publish">⬆ Publish Game</button>
+                <div class="ca-auth-target"></div>
+            </div>
+        </header>
+
+        <!-- ══════════ CONTENT BODY ══════════ -->
+        <div class="content">
+
+            <!-- ── Left Config Panel ── -->
+            <aside class="panel-left">
+                <div class="panel-tabs">
+                    <div class="panel-tab active" data-tab="config">Config</div>
+                    <div class="panel-tab" data-tab="assets">Assets</div>
+                    <div class="panel-tab" data-tab="logic">Logic</div>
+                </div>
+                <div class="panel-body">
+
+                    <!-- CONFIG PANE -->
+                    <div class="panel-pane active" id="pane-config">
+                        <div class="cfg-label"><span class="dot"></span> Game Template</div>
+                        <select class="builder-select" id="sel-template">
+                            <option value="hangman">Hangman (Syntax)</option>
+                            <option value="tictactoe">Tic Tac Toe (Layout)</option>
+                            <option value="maze">Logic Maze</option>
+                            <option value="quiz">Code Quiz</option>
+                            <option value="blank">Blank Canvas</option>
+                        </select>
+
+                        <div class="cfg-label"><span class="dot"></span> Difficulty</div>
+                        <div class="diff-picker">
+                            <button class="diff-btn" data-d="Easy">Easy</button>
+                            <button class="diff-btn active" data-d="Medium">Medium</button>
+                            <button class="diff-btn" data-d="Hard">Hard</button>
+                        </div>
+
+                        <div class="cfg-label"><span class="dot"></span> Primary Language</div>
+                        <div class="lang-grid">
+                            <div class="lang-tag" data-lang="HTML">HTML</div>
+                            <div class="lang-tag active" data-lang="JS">JS</div>
+                            <div class="lang-tag" data-lang="C++">C++</div>
+                            <div class="lang-tag" data-lang="Python">Python</div>
+                            <div class="lang-tag" data-lang="CSS">CSS</div>
+                            <div class="lang-tag" data-lang="SQL">SQL</div>
+                        </div>
+
+                        <div class="cfg-label"><span class="dot"></span> Timer (sec)</div>
+                        <select class="builder-select" id="sel-timer">
+                            <option>Off</option>
+                            <option>30</option>
+                            <option selected>60</option>
+                            <option>120</option>
+                            <option>300</option>
+                        </select>
+
+                        <div class="cfg-label"><span class="dot"></span> Max Players</div>
+                        <select class="builder-select">
+                            <option>1 (Solo)</option>
+                            <option>2 (Versus)</option>
+                            <option>4 (Party)</option>
+                        </select>
+                    </div>
+
+                    <!-- ASSETS PANE -->
+                    <div class="panel-pane" id="pane-assets">
+                        <div class="asset-list">
+                            <div class="asset-item"><span class="asset-icon">🎵</span><span
+                                    class="asset-name">bg_music.mp3</span><span class="asset-size">128kb</span></div>
+                            <div class="asset-item"><span class="asset-icon">🖼</span><span
+                                    class="asset-name">sprite_player.png</span><span class="asset-size">42kb</span>
+                            </div>
+                            <div class="asset-item"><span class="asset-icon">🔊</span><span
+                                    class="asset-name">sfx_correct.wav</span><span class="asset-size">12kb</span></div>
+                            <div class="asset-item"><span class="asset-icon">🔊</span><span
+                                    class="asset-name">sfx_wrong.wav</span><span class="asset-size">11kb</span></div>
+                        </div>
+                        <button class="asset-upload" onclick="showToast('📂 Upload feature coming soon!','info')">+
+                            Upload Asset</button>
+                        <div class="cfg-label"><span class="dot"></span> Total: 193kb / 5mb</div>
+                    </div>
+
+                    <!-- LOGIC PANE -->
+                    <div class="panel-pane" id="pane-logic">
+                        <div class="logic-item"><span class="logic-dot" style="background:var(--green)"></span><span
+                                class="logic-label">onGameStart()</span><span class="logic-val">bound</span></div>
+                        <div class="logic-item"><span class="logic-dot" style="background:var(--cyan)"></span><span
+                                class="logic-label">onAnswer()</span><span class="logic-val">bound</span></div>
+                        <div class="logic-item"><span class="logic-dot" style="background:var(--orange)"></span><span
+                                class="logic-label">onTimeout()</span><span class="logic-val">2 hooks</span></div>
+                        <div class="logic-item"><span class="logic-dot" style="background:var(--text-dim)"></span><span
+                                class="logic-label">onGameEnd()</span><span class="logic-val">unset</span></div>
+                        <div class="logic-item"><span class="logic-dot" style="background:var(--purple)"></span><span
+                                class="logic-label">onScore()</span><span class="logic-val">bound</span></div>
+                        <div style="margin-top:12px">
+                            <button class="asset-upload"
+                                onclick="showToast('🔧 Visual Logic editor coming soon!','info')">+ Add Hook</button>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+            <!-- ── Editor ── -->
+            <div class="editor-wrap">
+                <div class="editor-tabs">
+                    <div class="editor-tab active" data-file="logic.js"><span class="tab-dot js"></span>logic.js<span
+                            class="tab-close">×</span></div>
+                    <div class="editor-tab" data-file="index.html"><span class="tab-dot html"></span>index.html<span
+                            class="tab-close">×</span></div>
+                    <div class="editor-tab" data-file="style.css"><span class="tab-dot css"></span>style.css<span
+                            class="tab-close">×</span></div>
+                </div>
+                <div class="editor-body">
+                    <div class="line-nums" id="line-nums"></div>
+                    <textarea class="code-editor" id="code-editor" spellcheck="false"></textarea>
+                </div>
+                <div class="statusbar">
+                    <span class="sb-item"><span>Ln 1, Col 1</span></span>
+                    <span class="sb-item sb-ok">● No Issues</span>
+                    <span class="sb-item">UTF-8</span>
+                    <span class="sb-item">Spaces: 2</span>
+                    <span class="sb-item sb-lang" id="sb-lang">JavaScript</span>
+                </div>
+            </div>
+
+            <!-- ── Preview Panel ── -->
+            <div class="panel-right" id="panel-right">
+                <div class="preview-header">
+                    <span class="preview-title">Live Preview</span>
+                    <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+                </div>
+                <div class="preview-chrome">
+                    <div class="chrome-dots">
+                        <div class="chrome-dot red"></div>
+                        <div class="chrome-dot yellow"></div>
+                        <div class="chrome-dot green"></div>
+                    </div>
+                    <div class="chrome-url" id="chrome-url">codearena.io/preview/untitled</div>
+                </div>
+                <div class="preview-frame-wrap">
+                    <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /app -->
+
+    <!-- ══════════ PUBLISH MODAL ══════════ -->
+    <div class="modal-overlay" id="modal-publish">
+        <div class="publish-modal">
+            <div class="modal-logo"><span class="code">Code</span><span class="arena">Arena</span></div>
+            <div class="modal-sub">GAME PUBLISHER</div>
+            <div class="modal-title">Publish Your Game</div>
+            <div class="modal-desc">Your game will be live on the CodeArena Library and discoverable by thousands of
+                developers worldwide.</div>
+            <div class="modal-field">
+                <label>Game Title</label>
+                <input type="text" class="modal-input" id="pub-title" placeholder="My Awesome Game">
+            </div>
+            <div class="modal-field">
+                <label>Description</label>
+                <textarea class="modal-input modal-textarea" id="pub-desc"
+                    placeholder="What does your game challenge players to do?"></textarea>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Category</label>
+                    <select class="modal-input">
+                        <option>Syntax Challenge</option>
+                        <option>Logic Puzzle</option>
+                        <option>Speed Coding</option>
+                        <option>Debugging</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>Visibility</label>
+                    <select class="modal-input">
+                        <option>Public</option>
+                        <option>Unlisted</option>
+                        <option>Private</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="cancel-publish">Cancel</button>
+                <button class="btn btn-publish" id="confirm-publish">⬆ Deploy to Library</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ PUBLISH SUCCESS MODAL ══════════ -->
+    <div class="modal-overlay" id="modal-success">
+        <div class="success-modal">
+            <div class="success-icon">🚀</div>
+            <div class="success-title">Game Published!</div>
+            <div class="success-sub">Your game is now live on the CodeArena Library</div>
+            <div class="success-link-box">
+                <span id="pub-link"
+                    style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">codearena.io/g/untitled</span>
+                <button class="copy-btn" id="copy-link">Copy</button>
+            </div>
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div class="stat-num" style="color:var(--cyan)">0</div>
+                    <div class="stat-lbl">Players</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color:var(--lime)">∞</div>
+                    <div class="stat-lbl">Replays</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color:var(--orange)">—</div>
+                    <div class="stat-lbl">Avg Score</div>
+                </div>
+            </div>
+            <button class="btn btn-publish" style="width:100%;justify-content:center" id="close-success">Back to
+                Builder</button>
+        </div>
+    </div>
+
+    <!-- ══════════ SAVE MODAL ══════════ -->
+    <div class="modal-overlay" id="modal-save">
+        <div class="save-modal">
+            <div class="modal-title" style="margin-bottom:4px">Save Draft</div>
+            <div class="modal-desc">Version history for <span id="save-game-name"
+                    style="color:var(--cyan)">Untitled_Game_01</span></div>
+            <div class="save-versions">
+                <div class="save-ver"><span class="save-ver-num">v0.3</span><span class="save-ver-time">Just now —
+                        auto</span><span class="save-ver-tag">current</span></div>
+                <div class="save-ver"><span class="save-ver-num">v0.2</span><span class="save-ver-time">10 minutes
+                        ago</span></div>
+                <div class="save-ver"><span class="save-ver-num">v0.1</span><span class="save-ver-time">1 hour ago —
+                        initial</span></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="cancel-save">Close</button>
+                <button class="btn btn-save" id="confirm-save"
+                    style="flex:1;justify-content:center;color:var(--lime);border-color:var(--lime)">⬡ Save Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ TOAST ══════════ -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toast-icon">✔</span>
+        <span id="toast-msg">Done!</span>
+        <span class="toast-close" onclick="hideToast()">×</span>
+    </div>
+
+
+</body>
+
+</html>

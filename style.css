@@ -350,389 +350,498 @@ img {
     background-color: black;
 }
 
-.programdiff {
-
-    min-height: 100vh;
-    /* takes full screen height */
-
+/* Defines the total scroll duration (length of the "pin") */
+.horizontal-scroll-container {
+    height: 400vh;
     background: #000;
-
-    padding: 80px 0;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-
+    position: relative;
 }
 
+/* Keeps the content in view while scrolling through the 400vh */
+/* Update the sticky wrapper to provide top clearance */
+.sticky-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 
+    /* Changed from center to flex-end or add padding-top */
+    justify-content: center;
+    background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
+}
 
-/* TITLE */
+.programdiff {
+    width: 100%;
+    padding: 0 5%;
+    /* Push the entire content down to clear the 60px + navbar height */
+    margin-top: 80px;
+}
 
 .level2-title {
     font-family: 'Zolla', sans-serif;
-    font-size: 60px;
-    margin-bottom: 50px;
+    font-size: 70px;
+    /* Slightly reduced to ensure it fits well on smaller screens */
+    margin-bottom: 20px;
+    /* Tighter margin to keep cards in view */
 
-    color: #ffff00;
-
-    text-shadow:
-        0 0 10px #ffff00,
-        0 0 20px #00ffff;
-
+    /* Keep your existing gradient and glow styles here */
+    background: linear-gradient(to bottom, #fff 20%, #ffff00 40%, #00ffff 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.6));
+    text-transform: uppercase;
 }
 
-
-/* SCROLL CONTAINER */
-
+/* Adjust the scrollbar padding so cards don't feel cut off at the bottom */
 .programdiff-scrollbar {
+    padding: 30px 0 60px 0;
     display: flex;
-    gap: 30px;
-    width: 100%;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    /* hide scrollbar Firefox */
+    gap: 60px;
+    will-change: transform;
 }
 
-.programdiff-scrollbar::-webkit-scrollbar {
-    display: none;
-
-    /* hide scrollbar Chrome/Safari */
-}
 
 
 /* CARD */
-
+/* Updated Card Container */
 .card {
+    min-width: 380px;
+    /* Slightly wider for better balance */
+    height: 420px;
+    /* Taller to fit more design elements */
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 0;
+    /* Reset previous margin */
 
-    min-width: 260px;
-    flex-shrink: 0;
-    height: 250px;
-
-    background: rgba(0, 0, 0, 0.6);
-
-    border-radius: 15px;
-
-
-    color: white;
-
-    border: 1px solid rgba(0, 255, 255, 0.4);
-
+    /* Multi-layered Border & Glow */
+    border: 2px solid rgba(0, 255, 255, 0.3);
     box-shadow:
-        0 0 10px rgba(0, 255, 255, 0.3),
-        0 0 20px rgba(255, 255, 0, 0.15);
-
-    transition: 0.3s;
-    padding: 2rem;
-    margin-top: 2rem;
-
-
-}
-
-.card img {
-
-    width: 100%;
-    /* full width of card */
-
-    height: 120px;
-    /* fixed height */
-
-    object-fit: cover;
-    /* crop image properly */
-
-    border-radius: 10px;
-
-    display: block;
-
-}
-
-
-/* CARD TITLE */
-
-.card h2 {
-    color: #00ffff;
-}
-
-
-.card:hover {
-
-    transform: translateY(-8px) scale(1.05);
-
-    box-shadow:
-        0 0 20px #00ffff,
-        0 0 35px #ffff00;
-
-}
-
-.games {
-
-    min-height: 100vh;
-    /* takes full screen height */
-
-    background: #000;
-
-    padding: 80px 0;
+        inset 0 0 20px rgba(0, 255, 255, 0.1),
+        0 10px 30px rgba(0, 0, 0, 0.5);
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+/* The Scanline Effect (Pseudo-element) */
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 255, 255, 0.05) 50%);
+    background-size: 100% 4px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.card img {
+    width: 100%;
+    height: 220px;
+    /* Balanced image height */
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    filter: grayscale(30%) contrast(1.1);
+    transition: 0.4s ease;
+}
+
+.card h2 {
+    font-family: 'Zolla', sans-serif;
+    font-size: 28px;
+    margin-top: 20px;
+    text-align: center;
+    color: #ccff00;
+    text-shadow: 0 0 10px rgba(204, 255, 0, 0.5);
+}
+
+/* Hover Interaction */
+.card:hover {
+    transform: translateY(-15px) scale(1.02);
+    border-color: #00ffff;
+    box-shadow:
+        0 0 30px rgba(0, 255, 255, 0.4),
+        0 0 60px rgba(204, 255, 0, 0.2);
+}
+
+.card:hover img {
+    filter: grayscale(0%) contrast(1.2);
+    transform: scale(1.05);
+}
+
+.games {
+    padding: 100px 5%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
     align-items: center;
 }
-.level3-title{
-    font-family: 'zolla', sans-serif;
-    font-size: 32px;
+
+.games-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.game-filters {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.filter-btn {
+    background: transparent;
+    border: 1px solid #00ffff;
     color: #00ffff;
-    text-shadow:
-        0 0 10px #00ffff,
-        0 0 20px #00ffff;  
-   
-    
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Zolla', sans-serif;
+    transition: 0.3s;
 }
-.level3-subtitle{
-    font-family: 'zolla', sans-serif;
-    font-size: 18px;
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: #00ffff;
+    color: #000;
+    box-shadow: 0 0 15px #00ffff;
+}
+
+/* Updated Game Grid */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.game-card {
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    transition: 0.4s ease;
+}
+
+.card-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ccff00;
+    color: #000;
+    padding: 4px 12px;
+    font-weight: bold;
+    border-radius: 5px;
+    z-index: 10;
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+.game-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: 0.5s;
+}
+
+.game-info {
+    padding: 25px;
+    text-align: left;
+}
+
+.game-info h3 {
+    font-family: 'Zolla', sans-serif;
+    color: #00ffff;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.game-info p {
+    color: #ccc;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.play-btn {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccff00;
+    background: transparent;
     color: #ccff00;
-    text-shadow:
-        0 0 10px #ccff00,
-        0 0 20px #ccff00;  
-    margin-bottom: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
 }
-.game-grid{
 
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
-
-    gap:30px;
-
-    width:100%;
-
-    max-width:1200px;
-
+/* Hover State */
+.game-card:hover {
+    transform: scale(1.05);
+    border-color: #00ffff;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
 }
-.game-card{
 
-    background:rgba(0,0,0,0.6);
-
-    border-radius:15px;
-
-    padding:15px;
-
-    text-align:center;
-
-    border:1px solid rgba(0,255,255,0.4);
-
-    box-shadow:
-        0 0 10px rgba(0,255,255,0.3),
-        0 0 20px rgba(255,255,0,0.15);
-
-    transition:0.3s;
-
+.game-card:hover img {
+    filter: brightness(1.2) saturate(1.2);
 }
-.game-card img{
 
-    width:100%;
-
-    height:180px;
-
-    object-fit:cover;
-
-    border-radius:10px;
-
-    margin-bottom:10px;
-
+.play-btn:hover {
+    background: #ccff00;
+    color: #000;
+    box-shadow: 0 0 15px #ccff00;
 }
-.game-card h3{
-
-    color:#00ffff;
-
-    font-family:'zolla', sans-serif;
-
+/* Premium Card Styling */
+.game-card.premium {
+    border: 2px solid #ff9900; /* Gold/Orange border */
+    box-shadow: 0 0 20px rgba(255, 153, 0, 0.2);
 }
-.game-card:hover{
 
-    transform:translateY(-8px) scale(1.03);
-
-    box-shadow:
-        0 0 20px #00ffff,
-        0 0 40px #ccff00;
-
+.card-tag.gold {
+    background: linear-gradient(45deg, #ffcc00, #ff9900);
+    color: #000;
 }
-.publish-game{
 
-    min-height:100vh;
+.premium-btn {
+    border-color: #ff9900 !important;
+    color: #ff9900 !important;
+}
 
-    background:#000;
+.premium-btn:hover {
+    background: #ff9900 !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px #ff9900 !important;
+}
 
-    display:flex;
-    flex-direction:column;
-
-    justify-content:center;
-    align-items:center;
-
-    text-align:center;
-
-    padding:80px 20px;
-
+/* For JS Filtering */
+.game-card.hidden {
+    display: none;
 }
 
 
-.publish-title{
+.publish-game {
+    position: relative;
+    min-height: 80vh;
+    /* Dark radial gradient to provide depth without hiding content */
+    background: radial-gradient(circle at center, #0a1a1a 0%, #000 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 100px 20px;
+    overflow: hidden;
+}
 
-    font-family:'zolla', sans-serif;
+.publish-title {
+    font-family: 'Zolla', sans-serif;
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #ffff00; /* Ensure title is bright yellow */
+    text-shadow: 0 0 15px #00ffff;
+}
 
-    font-size:42px;
+.publish-text {
+    margin-top: 20px;
+    max-width: 600px;
+    color: #e0e0e0; /* Light gray for readability on black */
+    font-size: 18px;
+    line-height: 1.6;
+}
 
-    color:#ffff00;
+/* Fix for the CodeArena span within the text */
+.publish-text .code {
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
+}
 
-    text-shadow:
-        0 0 10px #ffff00,
-        0 0 20px #00ffff;
+.publish-text .arena {
+    color: #ccff00;
+    text-shadow: 0 0 5px #ccff00;
+}
 
+/* Enhanced CTA Button */
+.publish-btn {
+    margin-top: 40px;
+    padding: 20px 50px;
+    font-size: 20px;
+    font-family: 'Zolla', sans-serif;
+    background: transparent;
+    border: 2px solid #00ffff;
+    color: #00ffff; /* Text is Cyan by default so it's visible */
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Hover State: This is where we use black text because the background becomes solid cyan */
+.publish-btn:hover {
+    background: #00ffff;
+    color: #000000; /* Text turns black only when background is bright cyan */
+    box-shadow: 0 0 40px #00ffff, 0 0 80px rgba(0, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.cta-container {
+    position: relative;
+    z-index: 5;
+    max-width: 800px;
+    text-align: center;
+}
+
+/* Background Glow Effect */
+.cta-glow-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: rgba(0, 255, 255, 0.1);
+    filter: blur(100px);
+    border-radius: 50%;
+    z-index: -1;
 }
 
 
-.publish-text{
 
-    margin-top:20px;
+.cta-features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0 50px;
+}
 
-    max-width:600px;
+.feature-item {
+    color: #ccff00;
+    font-family: 'Zolla', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+}
 
-    color:#ddd;
-
-    font-size:18px;
-
+.feature-item span {
+    color: #00ffff;
 }
 
 
-.publish-btn{
-
-    margin-top:40px;
-
-    padding:15px 40px;
-
-    font-size:18px;
-
-    border-radius:30px;
-
-    border:2px solid #00ffff;
-
-    background:transparent;
-
-    color:#00ffff;
-
-    cursor:pointer;
-
-    transition:0.3s;
-
+/* Pulsing Animation */
+@keyframes pulse-cyan {
+    0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(0, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
 }
 
-
-/* hover glow */
-
-.publish-btn:hover{
-
-    background:#00ffff;
-
-    color:black;
-
-    box-shadow:
-        0 0 15px #00ffff,
-        0 0 30px #ffff00;
-
-}
-.footer{
-
-    background:#000;
-
-    text-align:center;
-
-    padding:60px 20px;
-
-    border-top:1px solid rgba(0,255,255,0.3);
-
+.pulse-animation {
+    animation: pulse-cyan 2s infinite;
 }
 
-
-.footer-logo{
-
-    font-family:'zolla', sans-serif;
-
-    font-size:32px;
-
-    margin-bottom:10px;
-
+.publish-btn:hover {
+    background: #00ffff;
+    color: #000;
+    transform: scale(1.05);
+    box-shadow: 0 0 40px #00ffff;
+}
+.footer {
+    background: #050505;
+    padding: 80px 5% 40px;
+    border-top: 2px solid rgba(0, 255, 255, 0.2);
+    font-family: 'Zolla', sans-serif;
 }
 
-
-.footer-tagline{
-
-    color:#ccc;
-
-    margin-bottom:30px;
-
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 50px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-
-.footer-links{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:30px;
-
-    margin-bottom:20px;
-
+.footer-brand {
+    max-width: 300px;
 }
 
-
-.footer-links a{
-
-    text-decoration:none;
-
-    color:#00ffff;
-
-    transition:0.3s;
-
+.footer-tagline {
+    color: #888;
+    font-family: sans-serif; /* Cleaner for long text */
+    margin-top: 15px;
+    line-height: 1.5;
 }
 
-
-.footer-links a:hover{
-
-    text-shadow:0 0 10px #00ffff;
-
+.footer-grid {
+    display: flex;
+    gap: 80px;
 }
 
-
-.footer-social{
-
-    margin-bottom:20px;
-
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-
-.footer-social a{
-
-    margin:0 10px;
-
-    color:#ccff00;
-
-    text-decoration:none;
-
+.footer-column h3 {
+    color: #ccff00;
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
 }
 
+.footer-column a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-size: 14px;
+    transition: 0.3s;
+}
 
-.footer-copy{
+.footer-column a:hover {
+    color: #00ffff;
+    text-shadow: 0 0 8px #00ffff;
+    transform: translateX(5px);
+}
 
-    font-size:14px;
+.footer-bottom {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    color:#888;
+.footer-copy {
+    color: #555;
+    font-family: sans-serif;
+    font-size: 12px;
+}
 
+/* Back to Top Button */
+.back-to-top {
+    background: transparent;
+    border: 1px solid #00ffff;
+    color: #00ffff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.back-to-top:hover {
+    background: #00ffff;
+    color: #000;
+    box-shadow: 0 0 15px #00ffff;
 }

@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeArena – CSS Tic Tac Toe</title>
+  <script src="../rocket-cursor.js" defer></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════
+       RESET & TOKENS
+    ══════════════════════════════════════════════ */
+    @font-face {
+      font-family: 'Zolla';
+      src: url('../assets/Zolla.woff2') format('woff2');
+      font-display: swap;
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #080d0d;
+      --card: #0d1616;
+      --card2: #111e1e;
+      --border: rgba(0, 255, 255, .13);
+      --c: #00ffff;
+      --y: #ccff00;
+      --err: #ff4444;
+      --ok: #44ff88;
+      --text: #c8eaea;
+      --muted: rgba(200, 234, 234, .45);
+      --glow-c: 0 0 5px #fff, 0 0 10px #00ffff, 0 0 40px #00ffff, 0 0 80px #008080;
+      --glow-y: 0 0 5px #fff, 0 0 10px #ccff00, 0 0 40px #ccff00, 0 0 80px #88aa00;
+      --gs: 0 0 6px #00ffff, 0 0 14px #00ffff;
+      --gsy: 0 0 6px #ccff00, 0 0 14px #ccff00;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(0, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, .025) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+
+    /* ══════════════════════════════════════════════
+       SHARED LOGO
+    ══════════════════════════════════════════════ */
+    .logo {
+      font-family: 'Zolla', sans-serif;
+      font-weight: 900;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      letter-spacing: 2px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    .logo .code {
+      color: #00ffff;
+      text-shadow: var(--glow-c);
+    }
+
+    .logo .arena {
+      color: #ccff00;
+      text-shadow: var(--glow-y);
+    }
+
+    /* ══════════════════════════════════════════════
+       SETUP WIZARD
+    ══════════════════════════════════════════════ */
+    #setup {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity .5s, visibility .5s;
+    }
+
+    #setup.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Step card */
+    .step {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 28px;
+      max-width: 560px;
+      width: 100%;
+      animation: stepIn .4s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .step.active {
+      display: flex;
+    }
+
+    @keyframes stepIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes stepOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(-16px);
+      }
+    }
+
+    .step.exiting {
+      animation: stepOut .25s ease forwards;
+    }
+
+    .step-num {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .step-q {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      letter-spacing: 2px;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .step-hint {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 420px;
+    }
+
+    /* Setup option buttons */
+    .setup-options {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .setup-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 22px 30px;
+      border-radius: 14px;
+      cursor: pointer;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      transition: all .2s;
+      min-width: 160px;
+    }
+
+    .setup-btn:hover {
+      border-color: var(--c);
+      box-shadow: 0 0 24px rgba(0, 255, 255, .2);
+      transform: translateY(-3px);
+    }
+
+    .setup-btn .sb-icon {
+      font-size: 2rem;
+    }
+
+    .setup-btn .sb-label {
+      font-family: 'Orbitron', monospace;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--c);
+    }
+
+    .setup-btn .sb-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .62rem;
+      color: var(--muted);
+    }
+
+    .setup-btn.diff-easy .sb-label {
+      color: var(--ok);
+    }
+
+    .setup-btn.diff-easy:hover {
+      border-color: var(--ok);
+      box-shadow: 0 0 24px rgba(68, 255, 136, .2);
+    }
+
+    .setup-btn.diff-medium .sb-label {
+      color: var(--c);
+    }
+
+    .setup-btn.diff-hard .sb-label {
+      color: var(--err);
+    }
+
+    .setup-btn.diff-hard:hover {
+      border-color: var(--err);
+      box-shadow: 0 0 24px rgba(255, 68, 68, .2);
+    }
+
+    .setup-btn.css-flex .sb-label {
+      color: var(--c);
+    }
+
+    .setup-btn.css-grid .sb-label {
+      color: var(--y);
+    }
+
+    .setup-btn.css-grid:hover {
+      border-color: var(--y);
+      box-shadow: 0 0 24px rgba(204, 255, 0, .2);
+    }
+
+    /* Progress dots */
+    .setup-progress {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sp-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0, 255, 255, .2);
+      transition: all .3s;
+    }
+
+    .sp-dot.active {
+      background: var(--c);
+      box-shadow: 0 0 8px var(--c);
+      transform: scale(1.3);
+    }
+
+    .sp-dot.done {
+      background: rgba(0, 255, 255, .5);
+    }
+
+    /* How to Play card in setup */
+    .howto-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .howto-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .howto-item .hi-num {
+      font-family: 'Orbitron', monospace;
+      font-size: .75rem;
+      font-weight: 900;
+      color: var(--c);
+      margin-bottom: 6px;
+    }
+
+    .howto-item p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .howto-item.y .hi-num {
+      color: var(--y);
+    }
+
+    .howto-item.y {
+      border-color: rgba(204, 255, 0, .13);
+    }
+
+    .start-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: .85rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 16px 48px;
+      border-radius: 12px;
+      cursor: pointer;
+      background: var(--c);
+      color: #000;
+      border: none;
+      box-shadow: 0 0 30px rgba(0, 255, 255, .5);
+      transition: all .2s;
+    }
+
+    .start-btn:hover {
+      box-shadow: 0 0 50px rgba(0, 255, 255, .7);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    /* config summary shown in howto step */
+    .config-summary {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .cs-pill {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(0, 255, 255, .06);
+      border: 1px solid rgba(0, 255, 255, .2);
+      color: var(--c);
+    }
+
+    /* ══════════════════════════════════════════════
+       GAME ROOT (hidden until setup done)
+    ══════════════════════════════════════════════ */
+    #game-root {
+      display: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px clamp(20px, 5vw, 60px);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+      max-width: 100%;
+    }
+
+    .header-hud {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Timer pill */
+    .timer-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1.5px solid rgba(0, 255, 255, .25);
+      border-radius: 30px;
+      padding: 7px 16px;
+      font-family: 'Orbitron', monospace;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--c);
+      transition: all .3s;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .timer-pill .t-icon {
+      font-size: .75rem;
+    }
+
+    .timer-pill.warn {
+      border-color: rgba(255, 140, 0, .5);
+      color: #ff8c00;
+      box-shadow: 0 0 12px rgba(255, 140, 0, .2);
+    }
+
+    .timer-pill.danger {
+      border-color: rgba(255, 68, 68, .6);
+      color: var(--err);
+      box-shadow: 0 0 16px rgba(255, 68, 68, .3);
+      animation: timerPulse .5s ease infinite alternate;
+    }
+
+    @keyframes timerPulse {
+      from {
+        transform: scale(1)
+      }
+
+      to {
+        transform: scale(1.04)
+      }
+    }
+
+    /* Score pill */
+    .score-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1.5px solid rgba(204, 255, 0, .2);
+      border-radius: 30px;
+      padding: 7px 16px;
+      font-family: 'Orbitron', monospace;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--y);
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .score-pill .s-label {
+      font-size: .55rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hdr-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .2s;
+      background: transparent;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hdr-btn.cyan {
+      color: var(--c);
+      border: 1.5px solid rgba(0, 255, 255, .3);
+    }
+
+    .hdr-btn.cyan:hover {
+      background: rgba(0, 255, 255, .08);
+      box-shadow: var(--gs);
+      border-color: var(--c);
+    }
+
+    .hdr-btn.lime {
+      color: var(--y);
+      border: 1.5px solid rgba(204, 255, 0, .3);
+    }
+
+    .hdr-btn.lime:hover {
+      background: rgba(204, 255, 0, .08);
+      box-shadow: var(--gsy);
+      border-color: var(--y);
+    }
+
+    /* ── CONTROLS STRIP (compact, collapsible settings) ── */
+    .settings-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px clamp(20px, 5vw, 60px);
+      gap: 10px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(0, 255, 255, .06);
+      background: rgba(0, 0, 0, .2);
+    }
+
+    .settings-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mini-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(0, 255, 255, .06);
+      border: 1px solid rgba(0, 255, 255, .18);
+      color: var(--c);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all .18s;
+    }
+
+    .mini-tag:hover {
+      border-color: var(--c);
+    }
+
+    .mini-tag.lime {
+      background: rgba(204, 255, 0, .06);
+      border-color: rgba(204, 255, 0, .18);
+      color: var(--y);
+    }
+
+    .mini-tag.green {
+      background: rgba(68, 255, 136, .06);
+      border-color: rgba(68, 255, 136, .18);
+      color: var(--ok);
+    }
+
+    .mini-tag.red {
+      background: rgba(255, 68, 68, .06);
+      border-color: rgba(255, 68, 68, .18);
+      color: var(--err);
+    }
+
+    .settings-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .s-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .18s;
+      background: transparent;
+    }
+
+    .s-btn.c {
+      color: var(--c);
+      border: 1.5px solid rgba(0, 255, 255, .3);
+    }
+
+    .s-btn.c:hover {
+      background: rgba(0, 255, 255, .08);
+    }
+
+    .s-btn.y {
+      color: var(--y);
+      border: 1.5px solid rgba(204, 255, 0, .25);
+    }
+
+    .s-btn.y:hover {
+      background: rgba(204, 255, 0, .06);
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px clamp(20px, 5vw, 60px) 80px;
+    }
+
+    /* ── INNER LIMITER — used by header + settings to match page width ── */
+    .inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 clamp(20px, 5vw, 60px);
+      width: 100%;
+    }
+
+    /* ── MAIN CARD ── */
+    .main-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 300px 1fr 260px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    @media(max-width:1100px) {
+      .main-card {
+        grid-template-columns: 260px 1fr;
+      }
+    }
+
+    @media(max-width:760px) {
+      .main-card {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+    }
+
+    /* ── PANEL TITLES ── */
+    .panel-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .panel-title span {
+      color: var(--c);
+    }
+
+    .panel-title.y span {
+      color: var(--y);
+    }
+
+    /* ── TERMINAL ── */
+    .code-block {
+      background: var(--card2);
+      border: 1px solid rgba(0, 255, 255, .1);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+    }
+
+    .cb-selector {
+      color: var(--c);
+      margin-bottom: 6px;
+    }
+
+    .cb-brace {
+      color: rgba(255, 255, 255, .3);
+    }
+
+    .cb-line {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 6px 0 6px 16px;
+      position: relative;
+    }
+
+    .cb-prop {
+      color: rgba(204, 255, 0, .65);
+      white-space: nowrap;
+      padding-right: 4px;
+      flex-shrink: 0;
+    }
+
+    .cb-colon {
+      color: rgba(255, 255, 255, .3);
+      padding-right: 6px;
+      flex-shrink: 0;
+    }
+
+    .term-input-wrap {
+      flex: 1;
+      position: relative;
+      background: rgba(0, 0, 0, .4);
+      border: 1px solid rgba(0, 255, 255, .2);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .term-input-wrap:focus-within {
+      border-color: var(--c);
+      box-shadow: 0 0 10px rgba(0, 255, 255, .2);
+    }
+
+    .term-input-wrap.valid {
+      border-color: var(--y);
+      box-shadow: 0 0 10px rgba(204, 255, 0, .2);
+    }
+
+    .term-input-wrap.invalid {
+      border-color: var(--err);
+      animation: shake .28s ease;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      30% {
+        transform: translateX(-4px)
+      }
+
+      70% {
+        transform: translateX(4px)
+      }
+    }
+
+    .term-cursor {
+      color: rgba(0, 255, 255, .4);
+      font-size: .9rem;
+      padding: 0 5px 0 8px;
+      user-select: none;
+    }
+
+    .term-inp {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .82rem;
+      color: var(--c);
+      caret-color: var(--y);
+      padding: 7px 4px 7px 0;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .term-inp.y-inp {
+      color: var(--y);
+    }
+
+    .term-inp::placeholder {
+      color: rgba(0, 255, 255, .22);
+    }
+
+    .term-check {
+      font-size: .75rem;
+      padding: 0 8px;
+      min-width: 22px;
+    }
+
+    .term-check.ok {
+      color: var(--y);
+    }
+
+    .term-check.err {
+      color: var(--err);
+    }
+
+    .ac-drop {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      right: 0;
+      background: #0a1515;
+      border: 1px solid rgba(0, 255, 255, .22);
+      border-radius: 6px;
+      z-index: 50;
+      display: none;
+      overflow: hidden;
+    }
+
+    .ac-drop.show {
+      display: block;
+    }
+
+    .ac-item {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      padding: 7px 12px;
+      color: rgba(0, 255, 255, .55);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background .1s;
+    }
+
+    .ac-item:hover,
+    .ac-item.hi {
+      background: rgba(0, 255, 255, .08);
+      color: var(--c);
+    }
+
+    .ac-item.cur-val {
+      color: var(--y);
+    }
+
+    .ac-hint {
+      font-size: .65rem;
+      color: rgba(204, 255, 0, .4);
+    }
+
+    .css-echo {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      background: var(--card2);
+      border-left: 3px solid rgba(204, 255, 0, .4);
+      border-radius: 0 6px 6px 0;
+      padding: 10px 12px;
+      color: rgba(204, 255, 0, .65);
+      line-height: 1.8;
+      margin-bottom: 14px;
+      min-height: 60px;
+    }
+
+    .cell-map {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      margin-bottom: 14px;
+    }
+
+    .cm-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      border: 1px solid rgba(0, 255, 255, .1);
+      background: var(--card2);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .55rem;
+      color: rgba(0, 255, 255, .2);
+      text-align: center;
+      line-height: 1.3;
+      transition: all .2s;
+    }
+
+    .cm-cell.aimed {
+      border-color: var(--c);
+      color: var(--c);
+      background: rgba(0, 255, 255, .1);
+      animation: cmBlink 1s ease infinite alternate;
+    }
+
+    .cm-cell.tx {
+      border-color: rgba(0, 255, 255, .2);
+      color: rgba(0, 255, 255, .15);
+      background: rgba(0, 255, 255, .04);
+    }
+
+    .cm-cell.to {
+      border-color: rgba(204, 255, 0, .2);
+      color: rgba(204, 255, 0, .15);
+      background: rgba(204, 255, 0, .03);
+    }
+
+    @keyframes cmBlink {
+      from {
+        box-shadow: none
+      }
+
+      to {
+        box-shadow: 0 0 10px rgba(0, 255, 255, .3), inset 0 0 8px rgba(0, 255, 255, .1)
+      }
+    }
+
+    #placeBtn {
+      width: 100%;
+      font-family: 'Orbitron', monospace;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 12px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: rgba(0, 255, 255, .08);
+      color: var(--c);
+      border: 1.5px solid var(--c);
+      box-shadow: 0 0 10px rgba(0, 255, 255, .15);
+      transition: all .18s;
+    }
+
+    #placeBtn:hover:not(:disabled) {
+      background: rgba(0, 255, 255, .15);
+      box-shadow: 0 0 24px rgba(0, 255, 255, .4);
+      transform: translateY(-1px);
+    }
+
+    #placeBtn:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #placeBtn.pop {
+      animation: btnPop .4s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    @keyframes btnPop {
+      0% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(.94)
+      }
+
+      100% {
+        transform: scale(1)
+      }
+    }
+
+    /* ── BOARD ── */
+    .board-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .turn-banner {
+      width: 100%;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-family: 'Orbitron', monospace;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .tb-x {
+      background: rgba(0, 255, 255, .07);
+      color: var(--c);
+      border: 1px solid rgba(0, 255, 255, .2);
+    }
+
+    .tb-o {
+      background: rgba(204, 255, 0, .07);
+      color: var(--y);
+      border: 1px solid rgba(204, 255, 0, .2);
+    }
+
+    .board-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: all .2s;
+    }
+
+    .cell:hover:not(.occupied) {
+      border-color: rgba(0, 255, 255, .3);
+      background: rgba(0, 255, 255, .04);
+    }
+
+    .cell.aimed {
+      border-color: var(--c) !important;
+      box-shadow: 0 0 16px rgba(0, 255, 255, .25), inset 0 0 12px rgba(0, 255, 255, .08) !important;
+    }
+
+    .cell.win-cell {
+      border-color: var(--y) !important;
+      background: rgba(204, 255, 0, .06) !important;
+    }
+
+    .cell-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .52rem;
+      color: rgba(0, 255, 255, .2);
+      text-align: center;
+      line-height: 1.6;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .cell.aimed .cell-lbl {
+      color: rgba(0, 255, 255, .5);
+    }
+
+    .mark {
+      position: absolute;
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 2rem;
+      animation: markIn .3s cubic-bezier(.34, 1.56, .64, 1);
+      pointer-events: none;
+    }
+
+    .mark-x {
+      color: var(--c);
+      text-shadow: var(--gs);
+    }
+
+    .mark-o {
+      color: var(--y);
+      text-shadow: var(--gsy);
+    }
+
+    @keyframes markIn {
+      from {
+        opacity: 0;
+        transform: scale(.4)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .win-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .win-path {
+      stroke: var(--y);
+      stroke-width: 4;
+      stroke-linecap: round;
+      fill: none;
+      filter: drop-shadow(0 0 6px var(--y));
+      animation: drawLine .5s ease forwards;
+      stroke-dasharray: 400;
+      stroke-dashoffset: 400;
+    }
+
+    @keyframes drawLine {
+      to {
+        stroke-dashoffset: 0
+      }
+    }
+
+    #statusMsg {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: var(--muted);
+      text-align: center;
+      min-height: 20px;
+    }
+
+    .act-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .act-btn {
+      flex: 1;
+      font-family: 'Orbitron', monospace;
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+      transition: all .18s;
+    }
+
+    .act-c {
+      color: var(--c);
+      border: 1.5px solid rgba(0, 255, 255, .3);
+    }
+
+    .act-c:hover {
+      background: rgba(0, 255, 255, .08);
+    }
+
+    .act-y {
+      color: var(--y);
+      border: 1.5px solid rgba(204, 255, 0, .25);
+    }
+
+    .act-y:hover {
+      background: rgba(204, 255, 0, .06);
+    }
+
+    /* ── REF ── */
+    .ref-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ref-card {
+      background: var(--card2);
+      border: 1px solid rgba(0, 255, 255, .08);
+      border-radius: 8px;
+      padding: 11px 13px;
+    }
+
+    .ref-prop {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      color: var(--c);
+      margin-bottom: 5px;
+    }
+
+    .ref-vals {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .63rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .ref-vals span {
+      color: var(--y);
+    }
+
+    /* ── MOVE LOG ── */
+    .move-log {
+      max-height: 150px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .mentry {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      padding: 4px 9px;
+      border-radius: 5px;
+      background: rgba(0, 255, 255, .03);
+      border-left: 2px solid transparent;
+      animation: fadeSlide .25s ease;
+    }
+
+    .mentry.mx {
+      border-left-color: var(--c);
+      color: rgba(0, 255, 255, .7);
+    }
+
+    .mentry.mo {
+      border-left-color: var(--y);
+      color: rgba(204, 255, 0, .7);
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateX(-5px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* ── MINI SCORE BAR (bottom of game) ── */
+    .score-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .sb-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 20px;
+      text-align: center;
+      min-width: 90px;
+    }
+
+    .sb-chip .sc-l {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .52rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .sb-chip .sc-v {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--c);
+      text-shadow: var(--gs);
+      line-height: 1;
+    }
+
+    .sb-chip.y .sc-v {
+      color: var(--y);
+      text-shadow: var(--gsy);
+    }
+
+    .sb-chip.streak .sc-v.fire {
+      animation: firePop .4s ease;
+    }
+
+    @keyframes firePop {
+
+      0%,
+      100% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.4);
+        text-shadow: 0 0 30px #ccff00
+      }
+    }
+
+    /* ── RESULT MODAL ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .82);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid rgba(0, 255, 255, .22);
+      border-radius: 16px;
+      padding: 36px 36px 30px;
+      max-width: 480px;
+      width: 92%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transform: scale(.92);
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .overlay.open .modal {
+      transform: scale(1);
+    }
+
+    .modal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--c), var(--y), transparent);
+    }
+
+    .m-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 1.9rem;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+
+    .m-win {
+      color: var(--y);
+      text-shadow: var(--glow-y);
+    }
+
+    .m-lose {
+      color: var(--err);
+      text-shadow: 0 0 10px rgba(255, 68, 68, .5);
+    }
+
+    .m-draw {
+      color: var(--c);
+      text-shadow: var(--glow-c);
+    }
+
+    .m-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.7;
+    }
+
+    /* Score breakdown in result */
+    .score-breakdown {
+      background: rgba(0, 0, 0, .3);
+      border: 1px solid rgba(204, 255, 0, .15);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .sb-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    .sb-row span:last-child {
+      color: var(--text);
+    }
+
+    .sb-total {
+      border-top: 1px solid rgba(204, 255, 0, .2);
+      margin-top: 8px;
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sb-total-label {
+      font-family: 'Orbitron', monospace;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+
+    .sb-total-val {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--y);
+      text-shadow: var(--gsy);
+    }
+
+    .m-lesson {
+      background: rgba(0, 255, 255, .05);
+      border: 1px solid rgba(0, 255, 255, .15);
+      border-radius: 8px;
+      padding: 13px 16px;
+      margin-bottom: 22px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: var(--c);
+      text-align: left;
+      line-height: 1.8;
+    }
+
+    .m-lesson .lbl {
+      font-size: .58rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .m-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .m-btn-solid {
+      font-family: 'Orbitron', monospace;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 11px 24px;
+      border-radius: 8px;
+      border: none;
+      background: var(--c);
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 0 14px rgba(0, 255, 255, .35);
+      transition: all .18s;
+    }
+
+    .m-btn-solid:hover {
+      box-shadow: 0 0 28px rgba(0, 255, 255, .6);
+      transform: translateY(-1px);
+    }
+
+    .m-btn-ol {
+      font-family: 'Orbitron', monospace;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--y);
+      border: 1.5px solid var(--y);
+      cursor: pointer;
+      transition: all .18s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .m-btn-ol:hover {
+      background: rgba(204, 255, 0, .1);
+      box-shadow: var(--gsy);
+    }
+
+    /* ── How to Play panel (in-game) ── */
+    .howto-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      backdrop-filter: blur(6px);
+      z-index: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .howto-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .howto-box {
+      background: var(--card);
+      border: 1px solid rgba(0, 255, 255, .2);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 520px;
+      width: 92%;
+      transform: scale(.93);
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .howto-overlay.open .howto-box {
+      transform: scale(1);
+    }
+
+    .howto-box h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      color: var(--c);
+      margin-bottom: 20px;
+      text-shadow: var(--gs);
+    }
+
+    .howto-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .hs-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .hs-num {
+      font-family: 'Orbitron', monospace;
+      font-size: .7rem;
+      font-weight: 900;
+      color: var(--y);
+      min-width: 24px;
+      margin-top: 2px;
+    }
+
+    .hs-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .hs-text b {
+      color: var(--c);
+    }
+
+    /* ── MISC ── */
+    .flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 900;
+      background: rgba(204, 255, 0, .08);
+      animation: fl .5s ease forwards;
+    }
+
+    @keyframes fl {
+      0% {
+        opacity: 0
+      }
+
+      25% {
+        opacity: 1
+      }
+
+      100% {
+        opacity: 0
+      }
+    }
+
+    .dots {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--y);
+      animation: db 1.1s infinite;
+    }
+
+    .dots span:nth-child(2) {
+      animation-delay: .18s
+    }
+
+    .dots span:nth-child(3) {
+      animation-delay: .36s
+    }
+
+    @keyframes db {
+
+      0%,
+      80%,
+      100% {
+        opacity: .2
+      }
+
+      40% {
+        opacity: 1
+      }
+    }
+
+    #ptcl {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .pt {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      animation: ptUp linear infinite;
+    }
+
+    @keyframes ptUp {
+      0% {
+        transform: translateY(105vh) scale(0);
+        opacity: 0
+      }
+
+      10% {
+        opacity: .6
+      }
+
+      90% {
+        opacity: .2
+      }
+
+      100% {
+        transform: translateY(-5vh) scale(1);
+        opacity: 0
+      }
+    }
+  </style>
+  <script src="../auth-widget.js" defer></script>
+
+</head>
+
+<body>
+  <div id="ptcl"></div>
+
+  <!-- ══════════════════════════════════════════════
+     SETUP WIZARD
+══════════════════════════════════════════════ -->
+  <div id="setup">
+
+    <!-- Dots -->
+    <div class="setup-progress" style="position:absolute;top:28px;left:50%;transform:translateX(-50%);">
+      <div class="sp-dot active" id="dot-0"></div>
+      <div class="sp-dot" id="dot-1"></div>
+      <div class="sp-dot" id="dot-2"></div>
+      <div class="sp-dot" id="dot-3"></div>
+    </div>
+
+    <a class="logo" href="../index.html" style="position:absolute;top:22px;left:24px;">
+      <span class="code">Code</span><span class="arena">Arena</span>
+
+    </a>
+
+    <!-- STEP 0 — Game Mode -->
+    <div class="step active" id="step-0">
+      <div class="step-num">Step 1 of 4 · Setup</div>
+      <div class="step-q">How do you want to play?</div>
+      <div class="setup-options">
+        <button class="setup-btn" onclick="pickMode('ai')">
+          <span class="sb-icon">⚡</span>
+          <span class="sb-label">VS Computer</span>
+          <span class="sb-sub">AI opponent · choose difficulty</span>
+        </button>
+        <button class="setup-btn" onclick="pickMode('pvp')">
+          <span class="sb-icon">👥</span>
+          <span class="sb-label">VS Player</span>
+          <span class="sb-sub">Local 2-player · same device</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 1 — Difficulty (AI only) -->
+    <div class="step" id="step-1">
+      <div class="step-num">Step 2 of 4 · Difficulty</div>
+      <div class="step-q">How hard should the AI be?</div>
+      <div class="setup-options">
+        <button class="setup-btn diff-easy" onclick="pickDiff('easy')">
+          <span class="sb-icon">🟢</span>
+          <span class="sb-label">Easy</span>
+          <span class="sb-sub">90 sec · random moves</span>
+        </button>
+        <button class="setup-btn diff-medium" onclick="pickDiff('medium')">
+          <span class="sb-icon">🟡</span>
+          <span class="sb-label">Medium</span>
+          <span class="sb-sub">60 sec · semi-smart</span>
+        </button>
+        <button class="setup-btn diff-hard" onclick="pickDiff('hard')">
+          <span class="sb-icon">🔴</span>
+          <span class="sb-label">Hard</span>
+          <span class="sb-sub">30 sec · unbeatable</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2 — CSS Mode -->
+    <div class="step" id="step-2">
+      <div class="step-num">Step 3 of 4 · CSS Mode</div>
+      <div class="step-q">Which CSS property to master?</div>
+      <div class="step-hint">Each cell on the board maps to a CSS coordinate.<br>Type the right values to place your
+        mark.</div>
+      <div class="setup-options">
+        <button class="setup-btn css-flex" onclick="pickCSS('flex')">
+          <span class="sb-icon">↔</span>
+          <span class="sb-label">Flexbox</span>
+          <span class="sb-sub">justify-content + align-items</span>
+        </button>
+        <button class="setup-btn css-grid" onclick="pickCSS('grid')">
+          <span class="sb-icon">⊞</span>
+          <span class="sb-label">CSS Grid</span>
+          <span class="sb-sub">grid-column + grid-row</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3 — How to Play + Start -->
+    <div class="step" id="step-3">
+      <div class="step-num">Step 4 of 4 · How to Play</div>
+      <div class="step-q">Quick Briefing</div>
+
+      <div class="config-summary">
+        <span class="cs-pill" id="cs-mode">VS Computer</span>
+        <span class="cs-pill" id="cs-diff" style="color:var(--ok);border-color:rgba(68,255,136,.2)">Easy · 90s</span>
+        <span class="cs-pill" id="cs-css" style="color:var(--y);border-color:rgba(204,255,0,.2)">Flexbox</span>
+      </div>
+
+      <div class="howto-grid">
+        <div class="howto-item">
+          <div class="hi-num">01 · Target a Cell</div>
+          <p>Type CSS values in the terminal on the left to highlight a board cell.</p>
+        </div>
+        <div class="howto-item y">
+          <div class="hi-num">02 · Execute</div>
+          <p>Press ▶ Execute or hit Enter to place your mark on the targeted cell.</p>
+        </div>
+        <div class="howto-item">
+          <div class="hi-num">03 · Win a Row</div>
+          <p>Get 3 in a row — horizontally, vertically, or diagonally — to win the round.</p>
+        </div>
+        <div class="howto-item y">
+          <div class="hi-num">04 · Score Points</div>
+          <p>Win faster with fewer errors to earn more points. Beat the timer!</p>
+        </div>
+      </div>
+
+      <button class="start-btn" onclick="startGame()">▶ START GAME</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+     GAME ROOT
+══════════════════════════════════════════════ -->
+  <div id="game-root">
+
+    <!-- HEADER -->
+    <div class="game-header">
+      <a class="logo" href="../index.html"><span class="code">Code</span><span class="arena">Arena</span></a>
+
+      <div class="header-hud">
+        <div class="timer-pill" id="timerPill">
+          <span class="t-icon">⏱</span>
+          <span id="timerVal">—</span>
+        </div>
+        <div class="score-pill">
+          <span class="s-label">PTS</span>
+          <span id="sessionPts">0</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="hdr-btn cyan" onclick="openHowto()">? How to Play</button>
+        <a class="hdr-btn lime" href="../leaderboard.html">🏆 Leaderboard</a>
+        <div class="ca-auth-target"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS STRIP -->
+    <div class="settings-strip">
+      <div class="settings-left">
+        <span class="mini-tag" id="tag-mode">⚡ VS Computer</span>
+        <span class="mini-tag" id="tag-diff" style="color:var(--ok);border-color:rgba(68,255,136,.18)">🟢 Easy</span>
+        <span class="mini-tag lime" id="tag-css">↔ Flexbox</span>
+      </div>
+      <div class="settings-right">
+        <button class="s-btn c" onclick="resetAll()">↺ Reset Stats</button>
+        <button class="s-btn y" onclick="goSetup()">⚙ Change Setup</button>
+      </div>
+    </div>
+
+    <!-- GAME PAGE -->
+    <div class="page">
+      <div class="main-card">
+
+        <!-- LEFT: TERMINAL -->
+        <div>
+          <div class="panel-title"><span id="termTitle">FLEX TERMINAL</span></div>
+
+          <div id="flexBlock">
+            <div class="code-block">
+              <div class="cb-selector">.container {</div>
+              <div style="margin-left:4px">
+                <div class="cb-line">
+                  <span class="cb-prop">justify-content</span><span class="cb-colon">:</span>
+                  <div class="term-input-wrap" id="jcWrap">
+                    <span class="term-cursor">›</span>
+                    <input class="term-inp" id="jcInp" placeholder="flex-start / center / flex-end" autocomplete="off"
+                      spellcheck="false" oninput="onInput('jc')" onkeydown="onKey(event,'jc')" onfocus="showAC('jc')"
+                      onblur="hideAC('jc',280)">
+                    <span class="term-check" id="jcChk"></span>
+                    <div class="ac-drop" id="jcAC"></div>
+                  </div>
+                </div>
+                <div class="cb-line">
+                  <span class="cb-prop">align-items</span><span class="cb-colon">:</span>
+                  <div class="term-input-wrap" id="aiWrap">
+                    <span class="term-cursor">›</span>
+                    <input class="term-inp y-inp" id="aiInp" placeholder="flex-start / center / flex-end"
+                      autocomplete="off" spellcheck="false" oninput="onInput('ai')" onkeydown="onKey(event,'ai')"
+                      onfocus="showAC('ai')" onblur="hideAC('ai',280)">
+                    <span class="term-check" id="aiChk"></span>
+                    <div class="ac-drop" id="aiAC"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="cb-brace">}</div>
+            </div>
+          </div>
+
+          <div id="gridBlock" style="display:none">
+            <div class="code-block">
+              <div class="cb-selector">.item {</div>
+              <div style="margin-left:4px">
+                <div class="cb-line">
+                  <span class="cb-prop">grid-column</span><span class="cb-colon">:</span>
+                  <div class="term-input-wrap" id="gcWrap">
+                    <span class="term-cursor">›</span>
+                    <input class="term-inp" id="gcInp" placeholder="1 · 2 · 3" autocomplete="off" spellcheck="false"
+                      oninput="onInput('gc')" onkeydown="onKey(event,'gc')" onfocus="showAC('gc')"
+                      onblur="hideAC('gc',280)">
+                    <span class="term-check" id="gcChk"></span>
+                    <div class="ac-drop" id="gcAC"></div>
+                  </div>
+                </div>
+                <div class="cb-line">
+                  <span class="cb-prop">grid-row</span><span class="cb-colon">:</span>
+                  <div class="term-input-wrap" id="grWrap">
+                    <span class="term-cursor">›</span>
+                    <input class="term-inp y-inp" id="grInp" placeholder="1 · 2 · 3" autocomplete="off"
+                      spellcheck="false" oninput="onInput('gr')" onkeydown="onKey(event,'gr')" onfocus="showAC('gr')"
+                      onblur="hideAC('gr',280)">
+                    <span class="term-check" id="grChk"></span>
+                    <div class="ac-drop" id="grAC"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="cb-brace">}</div>
+            </div>
+          </div>
+
+          <div class="panel-title" style="margin-bottom:8px"><span>GRID MAP</span></div>
+          <div class="cell-map" id="cellMap"></div>
+          <div class="css-echo" id="cssEcho">// type above to see generated CSS…</div>
+          <button id="placeBtn" disabled onclick="placeFromCtrl()">▶ EXECUTE PLACEMENT</button>
+        </div>
+
+        <!-- CENTER: BOARD -->
+        <div class="board-col">
+          <div class="turn-banner tb-x" id="turnBanner">✕ PLAYER 1'S TURN</div>
+          <div class="board-wrap">
+            <div id="board"></div>
+            <svg class="win-svg" id="winSVG" style="display:none">
+              <line class="win-path" id="winLine" x1="0" y1="0" x2="0" y2="0" />
+            </svg>
+          </div>
+          <div id="statusMsg">// type CSS values to target a cell</div>
+          <div class="act-row">
+            <button class="act-btn act-c" onclick="newRound()">↺ New Round</button>
+            <button class="act-btn act-y" onclick="showHint()">💡 Hint</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: REF + LOG -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <div class="panel-title y"><span id="refTitle">FLEXBOX REFERENCE</span></div>
+            <div class="ref-list" id="refList"></div>
+          </div>
+          <div>
+            <div class="panel-title"><span>MOVE LOG</span></div>
+            <div class="move-log" id="moveLog"></div>
+          </div>
+        </div>
+
+      </div><!-- /main-card -->
+
+      <!-- SCORE BAR -->
+      <div class="score-bar">
+        <div class="sb-chip">
+          <div class="sc-l" id="p1lbl">Player 1 · X</div>
+          <div class="sc-v" id="p1s">0</div>
+        </div>
+        <div class="sb-chip streak">
+          <div class="sc-l">🔥 Streak</div>
+          <div class="sc-v" id="strV">0</div>
+        </div>
+        <div class="sb-chip y">
+          <div class="sc-l">⭐ Best</div>
+          <div class="sc-v" id="bestV">0</div>
+        </div>
+        <div class="sb-chip y">
+          <div class="sc-l">≈ Draws</div>
+          <div class="sc-v" id="drawV">0</div>
+        </div>
+        <div class="sb-chip">
+          <div class="sc-l" id="p2lbl">Computer · O</div>
+          <div class="sc-v" id="p2s">0</div>
+        </div>
+      </div>
+
+    </div><!-- /page -->
+  </div><!-- /game-root -->
+
+  <!-- ══════════ RESULT MODAL ══════════ -->
+  <div class="overlay" id="resultOv">
+    <div class="modal">
+      <div class="m-title" id="mTitle">VICTORY!</div>
+      <div class="m-sub" id="mSub"></div>
+      <div class="score-breakdown" id="scoreBreakdown" style="display:none">
+        <div class="sb-row"><span>Base Score</span><span id="sbBase">0</span></div>
+        <div class="sb-row"><span>Time Bonus</span><span id="sbTime">+0</span></div>
+        <div class="sb-row"><span>Wrong Inputs</span><span id="sbWrong">-0</span></div>
+        <div class="sb-total">
+          <span class="sb-total-label">ROUND SCORE</span>
+          <span class="sb-total-val" id="sbTotal">0</span>
+        </div>
+      </div>
+      <div class="m-lesson">
+        <span class="lbl">// CSS LESSON</span>
+        <span id="mLesson"></span>
+      </div>
+      <div class="m-btns">
+        <button class="m-btn-solid" onclick="closeOv('resultOv');newRound()">▶ Next Round</button>
+        <a class="m-btn-ol" href="../leaderboard.html">🏆 Leaderboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ HOW TO PLAY OVERLAY ══════════ -->
+  <div class="howto-overlay" id="howtoOv">
+    <div class="howto-box">
+      <h2>// HOW TO PLAY</h2>
+      <div class="howto-steps">
+        <div class="hs-row">
+          <div class="hs-num">01</div>
+          <div class="hs-text">Look at the 9 cells on the board. Each cell has a <b>CSS coordinate</b> label.</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-num">02</div>
+          <div class="hs-text">Type the matching CSS values in the <b>terminal</b> on the left. The target cell will
+            highlight.</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-num">03</div>
+          <div class="hs-text">Press <b>▶ Execute Placement</b> (or Enter twice) to place your mark on the targeted
+            cell.</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-num">04</div>
+          <div class="hs-text">Get <b>3 in a row</b> before your opponent. In Flexbox mode use justify-content +
+            align-items. In Grid mode use grid-column + grid-row.</div>
+        </div>
+        <div class="hs-row">
+          <div class="hs-num">05</div>
+          <div class="hs-text">Win quickly with fewer wrong inputs to earn a <b>higher score</b>. Scores sync to the
+            Leaderboard page.</div>
+        </div>
+      </div>
+      <button class="m-btn-solid" onclick="closeOv('howtoOv')" style="width:100%">Got It — Back to Game</button>
+    </div>
+  </div>
+
+  <script>
+    /* ══════════════════════════════════════════════
+       DATA TABLES  (unchanged from original)
+    ══════════════════════════════════════════════ */
+    const FV = ['flex-start', 'center', 'flex-end'];
+    const FH = { 'flex-start': '→ start', 'center': '→ middle', 'flex-end': '→ end' };
+    const GV = ['1', '2', '3'];
+    const GH = { '1': 'left/top', '2': 'center', '3': 'right/bot' };
+    const FM = { 'flex-start': 0, 'center': 1, 'flex-end': 2 };
+    const CF = [
+      ['flex-start', 'flex-start'], ['center', 'flex-start'], ['flex-end', 'flex-start'],
+      ['flex-start', 'center'], ['center', 'center'], ['flex-end', 'center'],
+      ['flex-start', 'flex-end'], ['center', 'flex-end'], ['flex-end', 'flex-end']
+    ];
+    const CG = [['1', '1'], ['2', '1'], ['3', '1'], ['1', '2'], ['2', '2'], ['3', '2'], ['1', '3'], ['2', '3'], ['3', '3']];
+    const WC = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+    const LESS = [
+      'align-items: flex-start — items align to the TOP of the cross axis.',
+      'align-items: center — items sit perfectly in the vertical MIDDLE.',
+      'align-items: flex-end — items drop to the BOTTOM of the cross axis.',
+      'justify-content: flex-start — items hug the LEFT start of the main axis.',
+      'justify-content: center — items are CENTERED horizontally.',
+      'justify-content: flex-end — items push to the RIGHT edge.',
+      'Diagonal! Combining justify + align targets any corner of the container.',
+      'Center (row 2 / col 2) is always justify:center + align:center.',
+    ];
+
+    /* ══════════════════════════════════════════════
+       GAME STATE
+    ══════════════════════════════════════════════ */
+    let board = Array(9).fill(null), curP = 'X', mode = 'ai', diff = 'easy', cssM = 'flex';
+    let gameOn = false, aimed = -1;
+    let V = { jc: null, ai: null, gc: null, gr: null }, AF = { jc: -1, ai: -1, gc: -1, gr: -1 };
+    const SC = { X: 0, O: 0, draws: 0, str: 0, strWho: null, best: 0 };
+    let sessionScore = 0;           // total pts this session
+    let roundWrongInputs = 0;       // wrong CSS inputs this round
+
+    /* ── TIMER STATE ── */
+    const TIMER_SECS = { easy: 90, medium: 60, hard: 45, pvp: 75 };
+    let timerInterval = null, timeLeft = 0, totalTime = 0;
+
+    /* ══════════════════════════════════════════════
+       SETUP WIZARD
+    ══════════════════════════════════════════════ */
+    let setupStep = 0;
+
+    function goStep(n) {
+      const cur = document.getElementById('step-' + setupStep);
+      cur.classList.add('exiting');
+      setTimeout(() => {
+        cur.classList.remove('active', 'exiting');
+        setupStep = n;
+        const next = document.getElementById('step-' + n);
+        next.classList.add('active');
+        // update dots
+        for (let i = 0; i < 4; i++) {
+          const d = document.getElementById('dot-' + i);
+          d.className = 'sp-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+        }
+      }, 260);
+    }
+
+    function pickMode(m) {
+      mode = m;
+      if (m === 'pvp') { diff = 'medium'; goStep(2); }   // skip difficulty step
+      else goStep(1);
+    }
+
+    function pickDiff(d) {
+      diff = d;
+      goStep(2);
+    }
+
+    function pickCSS(m) {
+      cssM = m;
+      // Update summary pills
+      const mLabel = mode === 'ai' ? '⚡ VS Computer' : '👥 VS Player';
+      const dLabel = mode === 'pvp' ? '👥 PvP · 75s' : ({ easy: '🟢 Easy · 90s', medium: '🟡 Medium · 60s', hard: '🔴 Hard · 45s' }[diff]);
+      const cLabel = m === 'flex' ? '↔ Flexbox' : '⊞ CSS Grid';
+      document.getElementById('cs-mode').textContent = mLabel;
+      document.getElementById('cs-diff').textContent = dLabel;
+      document.getElementById('cs-css').textContent = cLabel;
+      // diff pill colour
+      const dp = document.getElementById('cs-diff');
+      dp.style.color = mode === 'pvp' ? 'var(--c)' : ({ easy: 'var(--ok)', medium: 'var(--c)', hard: 'var(--err)' }[diff]);
+      goStep(3);
+    }
+
+    function startGame() {
+      // Hide setup, show game
+      document.getElementById('setup').classList.add('hidden');
+      document.getElementById('game-root').style.display = 'block';
+
+      // Update settings strip tags
+      document.getElementById('tag-mode').textContent = mode === 'ai' ? '⚡ VS Computer' : '👥 VS Player';
+      const dTag = mode === 'pvp' ? '🟡 PvP' : ({ easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' }[diff]);
+      const dtEl = document.getElementById('tag-diff');
+      dtEl.textContent = dTag;
+      dtEl.className = 'mini-tag ' + (mode === 'pvp' ? '' : ({ easy: 'green', medium: '', hard: 'red' }[diff]));
+      document.getElementById('tag-css').textContent = cssM === 'flex' ? '↔ Flexbox' : '⊞ CSS Grid';
+
+      // Show/hide diff section in settings
+      document.getElementById('diffGroup') && (document.getElementById('diffGroup').style.display = mode === 'ai' ? '' : 'none');
+      document.getElementById('p2lbl').textContent = mode === 'ai' ? 'Computer · O' : 'Player 2 · O';
+
+      loadData();
+      applyCSSMode(cssM);
+      updateStats();
+      spawnPt();
+      newRound();
+    }
+
+    function goSetup() {
+      stopTimer();
+      setupStep = 0;
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'exiting'));
+      document.getElementById('step-0').classList.add('active');
+      for (let i = 0; i < 4; i++) {
+        document.getElementById('dot-' + i).className = 'sp-dot' + (i === 0 ? ' active' : '');
+      }
+      document.getElementById('setup').classList.remove('hidden');
+      document.getElementById('game-root').style.display = 'none';
+    }
+
+    /* ══════════════════════════════════════════════
+       TIMER
+    ══════════════════════════════════════════════ */
+    function startTimer() {
+      stopTimer();
+      totalTime = timeLeft = mode === 'pvp' ? TIMER_SECS.pvp : TIMER_SECS[diff];
+      updateTimerUI();
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0) { clearInterval(timerInterval); onTimeout(); }
+      }, 1000);
+    }
+
+    function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+
+    function updateTimerUI() {
+      const pill = document.getElementById('timerPill');
+      const val = document.getElementById('timerVal');
+      val.textContent = timeLeft + 's';
+      pill.classList.remove('warn', 'danger');
+      if (timeLeft <= 8) pill.classList.add('danger');
+      else if (timeLeft <= totalTime * 0.33) pill.classList.add('warn');
+    }
+
+    function onTimeout() {
+      if (!gameOn) return;
+      gameOn = false;
+      setKeyboardDisabled(true);
+      [...currentWord()].forEach((l, i) => { }); // no word in ttt
+      // Reveal board
+      [...board].forEach((v, i) => {
+        if (!v) {
+          const cells = document.querySelectorAll('#board .cell');
+          if (cells[i]) cells[i].style.opacity = '.4';
+        }
+      });
+      openResultModal(false, true);
+    }
+
+    function currentWord() { return []; } // compatibility stub
+
+    /* ══════════════════════════════════════════════
+       SCORING
+    ══════════════════════════════════════════════ */
+    const BASE_SCORE = { easy: 100, medium: 250, hard: 500, pvp: 200 };
+    const TIME_MULT = { easy: 1, medium: 3, hard: 8, pvp: 2 };
+    const WRONG_PEN = { easy: 5, medium: 15, hard: 30, pvp: 10 };
+
+    function calcScore() {
+      const k = mode === 'pvp' ? 'pvp' : diff;
+      const base = BASE_SCORE[k];
+      const tBonus = timeLeft * TIME_MULT[k];
+      const penalty = roundWrongInputs * WRONG_PEN[k];
+      const total = Math.max(base + tBonus - penalty, 10);
+      return { base, tBonus, penalty, total };
+    }
+
+    /* Save to localStorage — compatible with leaderboard.html */
+    const LS_TTT = 'codearena_ttt_scores';
+    function saveTTTScore(score) {
+      let arr = [];
+      try { arr = JSON.parse(localStorage.getItem(LS_TTT) || '[]'); } catch { }
+      arr.push({
+        score,
+        word: cssM === 'flex' ? 'FLEX WIN' : 'GRID WIN', // "word" field reused for display
+        category: cssM,          // 'flex' or 'grid'
+        difficulty: mode === 'pvp' ? 'pvp' : diff,
+        date: new Date().toLocaleDateString(),
+        isoDate: new Date().toISOString(),
+        game: 'tictactoe',
+        player: (() => { try { return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; } catch { return 'Anonymous'; } })()
+      });
+      arr.sort((a, b) => b.score - a.score);
+      arr.splice(50);
+      localStorage.setItem(LS_TTT, JSON.stringify(arr));
+    }
+
+    /* ══════════════════════════════════════════════
+       BOARD  (unchanged logic)
+    ══════════════════════════════════════════════ */
+    function buildBoard() {
+      const el = document.getElementById('board');
+      el.querySelectorAll('.cell').forEach(c => c.remove());
+      document.getElementById('winSVG').style.display = 'none';
+      for (let i = 0; i < 9; i++) {
+        const c = document.createElement('div'); c.className = 'cell'; c.onclick = () => clickCell(i);
+        const lb = document.createElement('div'); lb.className = 'cell-lbl';
+        if (cssM === 'flex') { const [j, a] = CF[i]; lb.innerHTML = `jc:${j.replace('flex-', '')}<br>ai:${a.replace('flex-', '')}`; }
+        else { const [g, r] = CG[i]; lb.innerHTML = `col:${g}<br>row:${r}`; }
+        c.appendChild(lb); el.appendChild(c);
+      }
+    }
+
+    function buildMap() {
+      const cm = document.getElementById('cellMap'); cm.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const d = document.createElement('div'); d.className = 'cm-cell';
+        if (cssM === 'flex') { const [j, a] = CF[i]; d.innerHTML = `${j.replace('flex-', '')}<br>${a.replace('flex-', '')}`; }
+        else { const [g, r] = CG[i]; d.innerHTML = `c:${g} r:${r}`; }
+        cm.appendChild(d);
+      }
+    }
+
+    function buildRef() {
+      const r = document.getElementById('refList');
+      document.getElementById('refTitle').textContent = cssM === 'flex' ? 'FLEXBOX REFERENCE' : 'CSS GRID REFERENCE';
+      if (cssM === 'flex') {
+        r.innerHTML = `
+      <div class="ref-card"><div class="ref-prop">justify-content</div><div class="ref-vals">main axis (↔)<br><span>flex-start</span> left · <span>center</span> center · <span>flex-end</span> right</div></div>
+      <div class="ref-card"><div class="ref-prop">align-items</div><div class="ref-vals">cross axis (↕)<br><span>flex-start</span> top · <span>center</span> mid · <span>flex-end</span> bottom</div></div>
+      <div class="ref-card"><div class="ref-prop">display: flex</div><div class="ref-vals">activates flexbox — children become <span>flex items</span></div></div>`;
+      } else {
+        r.innerHTML = `
+      <div class="ref-card"><div class="ref-prop">grid-column</div><div class="ref-vals">which column (1–3)<br><span>1</span> left · <span>2</span> center · <span>3</span> right</div></div>
+      <div class="ref-card"><div class="ref-prop">grid-row</div><div class="ref-vals">which row (1–3)<br><span>1</span> top · <span>2</span> middle · <span>3</span> bottom</div></div>
+      <div class="ref-card"><div class="ref-prop">display: grid</div><div class="ref-vals">use <span>grid-template-columns</span> to set tracks</div></div>`;
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       INPUT  (unchanged logic)
+    ══════════════════════════════════════════════ */
+    const validVals = t => (t === 'gc' || t === 'gr') ? GV : FV;
+    const hints = t => (t === 'gc' || t === 'gr') ? GH : FH;
+
+    function onInput(t) {
+      const inp = gid(t + 'Inp'), wrap = gid(t + 'Wrap'), chk = gid(t + 'Chk');
+      const raw = inp.value.trim().toLowerCase();
+      wrap.classList.remove('valid', 'invalid'); chk.className = 'term-check'; chk.textContent = '';
+      V[t] = null; AF[t] = -1;
+      if (!raw) { buildAC(t, ''); recalcAim(); return; }
+      const vv = validVals(t), matches = vv.filter(v => v.startsWith(raw));
+      buildAC(t, raw);
+      if (vv.includes(raw)) {
+        V[t] = raw; wrap.classList.add('valid'); chk.className = 'term-check ok'; chk.textContent = '✓';
+        gid(t + 'AC').classList.remove('show');
+      } else if (!matches.length) {
+        wrap.classList.add('invalid'); chk.className = 'term-check err'; chk.textContent = '✗';
+        roundWrongInputs++;   // ← track wrong inputs for score
+      }
+      recalcAim();
+    }
+
+    function onKey(e, t) {
+      const ac = gid(t + 'AC'), items = [...ac.querySelectorAll('.ac-item')];
+      if (e.key === 'ArrowDown') { e.preventDefault(); AF[t] = Math.min(AF[t] + 1, items.length - 1); items.forEach((it, i) => it.classList.toggle('hi', i === AF[t])); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); AF[t] = Math.max(AF[t] - 1, 0); items.forEach((it, i) => it.classList.toggle('hi', i === AF[t])); }
+      else if (e.key === 'Tab' || e.key === 'Enter') {
+        e.preventDefault();
+        if (AF[t] >= 0 && items[AF[t]]) { pickAC(t, items[AF[t]].dataset.v); }
+        else { const m = validVals(t).find(v => v.startsWith(gid(t + 'Inp').value.trim().toLowerCase())); if (m) pickAC(t, m); }
+        if (e.key === 'Enter') nextFocus(t);
+      } else if (e.key === 'Escape') { ac.classList.remove('show'); }
+    }
+    function nextFocus(t) { const o = cssM === 'flex' ? ['jc', 'ai'] : ['gc', 'gr']; const i = o.indexOf(t); if (i < o.length - 1) gid(o[i + 1] + 'Inp').focus(); }
+    function showAC(t) { buildAC(t, gid(t + 'Inp').value.trim().toLowerCase()); }
+    function hideAC(t, d) { setTimeout(() => gid(t + 'AC').classList.remove('show'), d); }
+
+    function buildAC(t, raw) {
+      const ac = gid(t + 'AC'), vv = validVals(t), h = hints(t);
+      const m = raw === '' ? vv : vv.filter(v => v.startsWith(raw));
+      if (!m.length) { ac.classList.remove('show'); return; }
+      ac.innerHTML = m.map(v => `<div class="ac-item${V[t] === v ? ' cur-val' : ''}" data-v="${v}" onmousedown="pickAC('${t}','${v}')">
+    <span>${raw.length ? '<b style="color:var(--c)">' + raw + '</b>' + v.slice(raw.length) : v}</span>
+    <span class="ac-hint">${h[v] || ''}</span>
+  </div>`).join('');
+      ac.classList.add('show');
+    }
+
+    function pickAC(t, val) {
+      const inp = gid(t + 'Inp'), wrap = gid(t + 'Wrap'), chk = gid(t + 'Chk');
+      inp.value = val; inp.focus(); AF[t] = -1; gid(t + 'AC').classList.remove('show');
+      V[t] = val; wrap.classList.remove('invalid'); wrap.classList.add('valid');
+      chk.className = 'term-check ok'; chk.textContent = '✓';
+      recalcAim();
+    }
+
+    /* ══════════════════════════════════════════════
+       TARGET
+    ══════════════════════════════════════════════ */
+    function calcTarget() {
+      if (cssM === 'flex') { if (!V.jc || !V.ai) return -1; return FM[V.ai] * 3 + FM[V.jc]; }
+      else { if (!V.gc || !V.gr) return -1; return (parseInt(V.gr) - 1) * 3 + (parseInt(V.gc) - 1); }
+    }
+
+    function recalcAim() {
+      aimed = calcTarget();
+      document.querySelectorAll('#board .cell').forEach((c, i) => { c.classList.toggle('aimed', i === aimed && !board[i] && gameOn); });
+      const cms = document.querySelectorAll('#cellMap .cm-cell');
+      cms.forEach((c, i) => { c.classList.remove('aimed', 'tx', 'to'); if (board[i] === 'X') c.classList.add('tx'); else if (board[i] === 'O') c.classList.add('to'); else if (i === aimed) c.classList.add('aimed'); });
+      echoCSS();
+      const ready = aimed !== -1 && !board[aimed] && gameOn && !(curP === 'O' && mode === 'ai');
+      gid('placeBtn').disabled = !ready;
+    }
+
+    function echoCSS() {
+      const e = gid('cssEcho');
+      if (cssM === 'flex') { const j = V.jc || '???', a = V.ai || '???'; e.innerHTML = `.container {\n  display: flex;\n  justify-content: <span style="color:var(--c)">${j}</span>;\n  align-items: <span style="color:var(--y)">${a}</span>;\n}`; }
+      else { const g = V.gc || '?', r = V.gr || '?'; e.innerHTML = `.item {\n  grid-column: <span style="color:var(--c)">${g}</span>;\n  grid-row: <span style="color:var(--y)">${r}</span>;\n}`; }
+    }
+
+    function clearInputs() {
+      ['jc', 'ai', 'gc', 'gr'].forEach(t => {
+        const inp = gid(t + 'Inp'); if (inp) inp.value = '';
+        const wrap = gid(t + 'Wrap'); if (wrap) wrap.classList.remove('valid', 'invalid');
+        const chk = gid(t + 'Chk'); if (chk) { chk.className = 'term-check'; chk.textContent = ''; }
+        const ac = gid(t + 'AC'); if (ac) ac.classList.remove('show');
+        V[t] = null; AF[t] = -1;
+      });
+      gid('cssEcho').innerHTML = '// type above to see generated CSS…';
+      gid('placeBtn').disabled = true; aimed = -1;
+      document.querySelectorAll('#board .cell').forEach(c => c.classList.remove('aimed'));
+      document.querySelectorAll('#cellMap .cm-cell').forEach(c => c.classList.remove('aimed'));
+    }
+
+    /* ══════════════════════════════════════════════
+       GAME FLOW
+    ══════════════════════════════════════════════ */
+    function newRound() {
+      board = Array(9).fill(null); curP = 'X'; gameOn = true;
+      roundWrongInputs = 0;
+      gid('moveLog').innerHTML = ''; clearInputs(); buildBoard(); buildMap(); updateTurn();
+      setStat('// type CSS values on the left to target a cell');
+      document.querySelectorAll('#board .cell').forEach(c => c.style.opacity = '');
+      startTimer();
+    }
+
+    function applyCSSMode(m) {
+      cssM = m;
+      gid('flexBlock').style.display = m === 'flex' ? '' : 'none';
+      gid('gridBlock').style.display = m === 'grid' ? '' : 'none';
+      gid('termTitle').textContent = m === 'flex' ? 'FLEX TERMINAL' : 'GRID TERMINAL';
+      buildRef(); clearInputs();
+    }
+
+    function clickCell(i) { if (!gameOn || board[i]) return; if (curP === 'O' && mode === 'ai') return; if (i === aimed) placeFromCtrl(); else setStat(`<b>Tip:</b> type CSS values to target this cell`); }
+
+    function placeFromCtrl() {
+      if (!gameOn) return; const t = calcTarget(); if (t === -1 || board[t]) return;
+      gid('placeBtn').classList.add('pop'); setTimeout(() => gid('placeBtn').classList.remove('pop'), 450);
+      placeMark(t, curP);
+    }
+
+    function placeMark(i, p) {
+      board[i] = p; renderCell(i, p); logMove(i, p); clearInputs();
+      const wi = chkWin(p); if (wi !== null) { endGame('win', p, wi); return; }
+      if (board.every(Boolean)) { endGame('draw'); return; }
+      curP = curP === 'X' ? 'O' : 'X'; updateTurn();
+      if (curP === 'O' && mode === 'ai') { gid('placeBtn').disabled = true; setStat(`<span class="dots"><span></span><span></span><span></span></span> Computer thinking…`); setTimeout(cpuMove, 550 + Math.random() * 500); }
+    }
+
+    function renderCell(i, p) {
+      const cells = document.querySelectorAll('#board .cell'); cells[i].classList.remove('aimed');
+      const m = document.createElement('div'); m.className = `mark mark-${p.toLowerCase()}`; m.textContent = p; cells[i].appendChild(m);
+      const cms = document.querySelectorAll('#cellMap .cm-cell'); cms[i].classList.add(p === 'X' ? 'tx' : 'to'); cms[i].classList.remove('aimed');
+    }
+
+    function logMove(i, p) {
+      const log = gid('moveLog'), e = document.createElement('div'); e.className = `mentry m${p.toLowerCase()}`;
+      const pn = p === 'X' ? 'P1' : (mode === 'ai' ? 'CPU' : 'P2');
+      if (cssM === 'flex') { const [j, a] = CF[i]; e.textContent = `${pn} → jc:${j.replace('flex-', '')} ai:${a.replace('flex-', '')}`; }
+      else { const [g, r] = CG[i]; e.textContent = `${pn} → col:${g} row:${r}`; }
+      log.insertBefore(e, log.firstChild);
+    }
+
+    function chkWin(p) { for (let i = 0; i < WC.length; i++) { const [a, b, c] = WC[i]; if (board[a] === p && board[b] === p && board[c] === p) return i; } return null; }
+    function chkWinArr(b, p) { return WC.some(([a, x, c]) => b[a] === p && b[x] === p && b[c] === p); }
+
+    function endGame(res, p, ci) {
+      gameOn = false; stopTimer(); gid('placeBtn').disabled = true;
+      if (res === 'win') {
+        SC[p]++; SC.strWho === p ? SC.str++ : (SC.strWho = p, SC.str = 1); if (SC.str > SC.best) SC.best = SC.str;
+        WC[ci].forEach(i => document.querySelectorAll('#board .cell')[i].classList.add('win-cell'));
+        drawWinLine(ci);
+        const fl = document.createElement('div'); fl.className = 'flash'; document.body.appendChild(fl); setTimeout(() => fl.remove(), 600);
+        const pn = p === 'X' ? 'Player 1' : (mode === 'ai' ? 'Computer' : 'Player 2');
+        // Score calc & save (only for P1 wins)
+        if (p === 'X') {
+          const { base, tBonus, penalty, total } = calcScore();
+          sessionScore += total;
+          saveTTTScore(total);
+          document.getElementById('sessionPts').textContent = sessionScore;
+          // Populate modal score breakdown
+          gid('sbBase').textContent = base + ' pts';
+          gid('sbTime').textContent = '+' + tBonus + ' pts';
+          gid('sbWrong').textContent = '-' + penalty + ' pts';
+          gid('sbTotal').textContent = total + ' pts';
+          gid('scoreBreakdown').style.display = '';
+        } else {
+          gid('scoreBreakdown').style.display = 'none';
+        }
+        setTimeout(() => {
+          const tt = gid('mTitle'); tt.className = 'm-title ' + (p === 'X' ? 'm-win' : (mode === 'ai' ? 'm-lose' : 'm-win'));
+          tt.textContent = p === 'X' ? 'VICTORY!' : (mode === 'ai' ? 'DEFEATED!' : 'P2 WINS!');
+          gid('mSub').textContent = `${pn} wins the round! Streak: ${SC.str} 🔥`;
+          gid('mLesson').textContent = LESS[ci] || LESS[0];
+          openOv('resultOv');
+        }, 650);
+      } else {
+        SC.draws++; SC.str = 0; SC.strWho = null;
+        gid('scoreBreakdown').style.display = 'none';
+        const isTO = res === 'timeout';
+        setTimeout(() => {
+          gid('mTitle').className = 'm-title m-draw';
+          gid('mTitle').textContent = isTO ? 'TIME\'S UP!' : 'DRAW!';
+          gid('mSub').textContent = isTO ? 'The round ran out of time.' : 'All cells taken. No winner this round.';
+          gid('mLesson').textContent = 'You used every possible CSS position — full coverage!';
+          openOv('resultOv');
+        }, 300);
+      }
+      saveData(); updateStats();
+    }
+
+    function drawWinLine(ci) {
+      const [a, , c] = WC[ci], el = gid('board'), cells = el.querySelectorAll('.cell');
+      const ctr = i => { const cr = cells[i].getBoundingClientRect(), br = el.getBoundingClientRect(); return { x: (cr.left - br.left + cr.width / 2) / br.width * 100, y: (cr.top - br.top + cr.height / 2) / br.height * 100 }; };
+      const p1 = ctr(a), p2 = ctr(c), sv = gid('winSVG'), ln = gid('winLine');
+      ln.setAttribute('x1', p1.x + '%'); ln.setAttribute('y1', p1.y + '%'); ln.setAttribute('x2', p2.x + '%'); ln.setAttribute('y2', p2.y + '%');
+      ln.style.animation = 'none'; ln.offsetHeight; ln.style.animation = ''; sv.style.display = 'block';
+    }
+
+    /* ══════════════════════════════════════════════
+       CPU AI  (unchanged)
+    ══════════════════════════════════════════════ */
+    function cpuMove() {
+      if (!gameOn) return;
+      let mv; if (diff === 'hard') mv = minimax(board, 'O').index; else if (diff === 'medium') mv = Math.random() < .65 ? best() : rand(); else mv = rand();
+      if (mv == null) return;
+      const [j, a] = CF[mv]; setStat(`CPU played: <b>jc:${j.replace('flex-', '')} ai:${a.replace('flex-', '')}</b>`);
+      placeMark(mv, 'O');
+    }
+    function rand() { const e = board.map((v, i) => v == null ? i : null).filter(i => i != null); return e[Math.floor(Math.random() * e.length)]; }
+    function best() {
+      for (let i = 0; i < 9; i++)if (!board[i]) { board[i] = 'O'; if (chkWin('O') !== null) { board[i] = null; return i; } board[i] = null; }
+      for (let i = 0; i < 9; i++)if (!board[i]) { board[i] = 'X'; if (chkWin('X') !== null) { board[i] = null; return i; } board[i] = null; }
+      if (!board[4]) return 4; return rand();
+    }
+    function minimax(b, p) {
+      const e = b.map((v, i) => v == null ? i : null).filter(i => i != null);
+      if (chkWinArr(b, 'O')) return { score: 10 }; if (chkWinArr(b, 'X')) return { score: -10 }; if (!e.length) return { score: 0 };
+      const ms = e.map(i => { b[i] = p; const r = minimax(b, p === 'O' ? 'X' : 'O'); b[i] = null; return { index: i, score: r.score }; });
+      return p === 'O' ? ms.reduce((a, b) => a.score > b.score ? a : b) : ms.reduce((a, b) => a.score < b.score ? a : b);
+    }
+
+    /* ══════════════════════════════════════════════
+       HINT
+    ══════════════════════════════════════════════ */
+    function showHint() {
+      if (!gameOn) return; const h = hintFor(curP); if (h == null) return;
+      const c = document.querySelectorAll('#board .cell')[h];
+      c.style.boxShadow = '0 0 20px rgba(204,255,0,.4),inset 0 0 15px rgba(204,255,0,.15)';
+      setTimeout(() => c.style.boxShadow = '', 1800);
+      const [j, a] = CF[h]; if (cssM === 'flex') setStat(`💡 Hint: <b>jc:${j.replace('flex-', '')} ai:${a.replace('flex-', '')}</b>`);
+      else { const [g, r] = CG[h]; setStat(`💡 Hint: <b>col:${g} row:${r}</b>`); }
+    }
+    function hintFor(p) {
+      for (let i = 0; i < 9; i++)if (!board[i]) { board[i] = p; if (chkWin(p) !== null) { board[i] = null; return i; } board[i] = null; }
+      if (!board[4]) return 4; const co = [0, 2, 6, 8].filter(i => !board[i]); if (co.length) return co[0];
+      return board.map((v, i) => v == null ? i : null).filter(i => i != null)[0];
+    }
+
+    /* ══════════════════════════════════════════════
+       UI HELPERS
+    ══════════════════════════════════════════════ */
+    function updateTurn() {
+      const b = gid('turnBanner'), p2 = mode === 'ai' ? 'Computer' : 'Player 2';
+      if (curP === 'X') { b.className = 'turn-banner tb-x'; b.textContent = "✕ PLAYER 1'S TURN"; }
+      else { b.className = 'turn-banner tb-o'; b.textContent = `◯ ${p2.toUpperCase()}'S TURN`; }
+    }
+    function setStat(h) { gid('statusMsg').innerHTML = h; }
+    function updateStats() {
+      gid('p1s').textContent = SC.X; gid('p2s').textContent = SC.O; gid('drawV').textContent = SC.draws;
+      const sv = gid('strV'); sv.textContent = SC.str;
+      if (SC.str >= 3) { sv.classList.add('fire'); setTimeout(() => sv.classList.remove('fire'), 500); }
+      gid('bestV').textContent = SC.best;
+    }
+    function setKeyboardDisabled(d) { gid('placeBtn').disabled = d; }
+    function resetAll() { Object.assign(SC, { X: 0, O: 0, draws: 0, str: 0, strWho: null, best: 0 }); sessionScore = 0; gid('sessionPts').textContent = 0; saveData(); updateStats(); newRound(); }
+
+    /* ══════════════════════════════════════════════
+       MODAL HELPERS
+    ══════════════════════════════════════════════ */
+    function openOv(id) { gid(id).classList.add('open'); }
+    function closeOv(id) { gid(id).classList.remove('open'); }
+    function openHowto() { openOv('howtoOv'); }
+
+    document.querySelectorAll('.overlay,.howto-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+
+    /* ══════════════════════════════════════════════
+       STORAGE
+    ══════════════════════════════════════════════ */
+    function saveData() { localStorage.setItem('ca_ttt', JSON.stringify(SC)); }
+    function loadData() { const s = localStorage.getItem('ca_ttt'); if (s) Object.assign(SC, JSON.parse(s)); }
+
+    /* ══════════════════════════════════════════════
+       PARTICLES
+    ══════════════════════════════════════════════ */
+    function spawnPt() {
+      const c = gid('ptcl');
+      for (let i = 0; i < 14; i++) {
+        const p = document.createElement('div'), isC = Math.random() > .5, sz = 1.5 + Math.random() * 3;
+        p.className = 'pt'; p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random() * 100}%;background:${isC ? '#00ffff' : '#ccff00'};box-shadow:0 0 5px ${isC ? '#00ffff' : '#ccff00'};animation-duration:${10 + Math.random() * 14}s;animation-delay:${-Math.random() * 18}s;`;
+        c.appendChild(p);
+      }
+    }
+
+    const gid = id => document.getElementById(id);
+
+    // Physical keyboard
+    document.addEventListener('keydown', e => {
+      if (!gameOn) return;
+      if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('term-inp')) return;
+      if (e.key === '\\' || e.key === 'Enter') { if (aimed !== -1 && !board[aimed]) placeFromCtrl(); }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predict the Output | CodeArena</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Open+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
+  <script src="../auth-widget.js" defer></script>
+  <style>
+    /* ═══════════════════════════════════════════
+     RESET & BASE  (mirrors hangman.css exactly)
+  ═══════════════════════════════════════════ */
+    @font-face {
+      font-family: 'Zolla';
+      src: url('../assets/Zolla.woff2') format('woff2');
+      font-display: swap;
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Zolla', 'Open Sans', sans-serif;
+    }
+
+    :root {
+      --cyan: #00ffff;
+      --yellow: #ccff00;
+      --bg: #080808;
+      --surface: #111318;
+      --surface2: #161b24;
+      --border: rgba(0, 255, 255, .18);
+      --text: #e8eaf0;
+      --muted: #6b7280;
+      --red: #ff4444;
+      --orange: #ff8c00;
+      --green: #39ff14;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      padding: 0 10px 80px;
+      background-image:
+        linear-gradient(rgba(0, 255, 255, .03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, .03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* ═══════════════════════════════════════════
+     HEADER  (matches .site-header in hangman)
+  ═══════════════════════════════════════════ */
+    .site-header {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo-text {
+      font-family: 'Zolla', sans-serif;
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: .05em;
+      text-decoration: none;
+      display: flex;
+      align-items: baseline;
+    }
+
+    .code {
+      color: #00ffff;
+      text-shadow: 0 0 5px #fff, 0 0 10px #00ffff, 0 0 40px #00ffff, 0 0 80px #008080;
+    }
+
+    .arena {
+      color: #ccff00;
+      text-shadow: 0 0 5px #fff, 0 0 10px #ccff00, 0 0 40px #ccff00, 0 0 80px #88aa00;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-lb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: transparent;
+      border: 2px solid var(--yellow);
+      color: var(--yellow);
+      font-weight: 700;
+      font-size: .88rem;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      transition: background .2s, box-shadow .2s, color .2s;
+      text-decoration: none;
+    }
+
+    .btn-lb:hover {
+      background: var(--yellow);
+      color: #000;
+      box-shadow: 0 0 16px var(--yellow);
+    }
+
+    .btn-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      background: transparent;
+      border: 2px solid rgba(0, 255, 255, .35);
+      color: var(--cyan);
+      font-weight: 700;
+      font-size: .85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      transition: all .2s;
+      text-decoration: none;
+    }
+
+    .btn-nav:hover {
+      background: rgba(0, 255, 255, .08);
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 255, 255, .3);
+    }
+
+    /* ═══════════════════════════════════════════
+     CONTROLS STRIP  (matches hangman exactly)
+  ═══════════════════════════════════════════ */
+    .controls-strip {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control-label {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .lang-btn {
+      padding: 9px 18px;
+      border: 2px solid rgba(0, 255, 255, .3);
+      background: var(--surface2);
+      color: var(--cyan);
+      font-weight: 700;
+      font-size: .82rem;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      transition: all .2s;
+    }
+
+    .lang-btn:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 255, 255, .25);
+    }
+
+    .lang-btn.active {
+      background: var(--cyan);
+      color: #000;
+      border-color: var(--cyan);
+      box-shadow: 0 0 18px rgba(0, 255, 255, .55);
+    }
+
+    .diff-btn {
+      padding: 9px 18px;
+      border: 2px solid transparent;
+      font-weight: 700;
+      font-size: .82rem;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      background: var(--surface2);
+      transition: all .2s;
+    }
+
+    .diff-btn[data-diff="easy"] {
+      color: var(--green);
+      border-color: rgba(57, 255, 20, .3);
+    }
+
+    .diff-btn[data-diff="medium"] {
+      color: var(--yellow);
+      border-color: rgba(204, 255, 0, .3);
+    }
+
+    .diff-btn[data-diff="hard"] {
+      color: var(--red);
+      border-color: rgba(255, 68, 68, .3);
+    }
+
+    .diff-btn[data-diff="easy"]:hover {
+      border-color: var(--green);
+      box-shadow: 0 0 12px rgba(57, 255, 20, .3);
+    }
+
+    .diff-btn[data-diff="medium"]:hover {
+      border-color: var(--yellow);
+      box-shadow: 0 0 12px rgba(204, 255, 0, .3);
+    }
+
+    .diff-btn[data-diff="hard"]:hover {
+      border-color: var(--red);
+      box-shadow: 0 0 12px rgba(255, 68, 68, .3);
+    }
+
+    .diff-btn.active[data-diff="easy"] {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 20px rgba(57, 255, 20, .5);
+    }
+
+    .diff-btn.active[data-diff="medium"] {
+      background: var(--yellow);
+      color: #000;
+      box-shadow: 0 0 20px rgba(204, 255, 0, .5);
+    }
+
+    .diff-btn.active[data-diff="hard"] {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255, 68, 68, .5);
+    }
+
+    /* ═══════════════════════════════════════════
+     TIMER BAR  (pixel-identical to hangman)
+  ═══════════════════════════════════════════ */
+    .timer-section {
+      width: 100%;
+      max-width: 960px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .timer-label {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      flex-shrink: 0;
+      min-width: 46px;
+    }
+
+    .timer-bar-wrap {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, .08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .timer-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--cyan);
+      border-radius: 99px;
+      transition: width .9s linear, background .4s;
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    .timer-bar-fill.warn {
+      background: var(--orange);
+      box-shadow: 0 0 8px var(--orange);
+    }
+
+    .timer-bar-fill.danger {
+      background: var(--red);
+      box-shadow: 0 0 10px var(--red);
+      animation: pulse-bar .5s infinite alternate;
+    }
+
+    @keyframes pulse-bar {
+      from {
+        opacity: 1
+      }
+
+      to {
+        opacity: .5
+      }
+    }
+
+    .timer-count {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      min-width: 42px;
+      text-align: right;
+      color: var(--cyan);
+      transition: color .3s;
+      flex-shrink: 0;
+    }
+
+    .timer-count.warn {
+      color: var(--orange);
+    }
+
+    .timer-count.danger {
+      color: var(--red);
+    }
+
+    /* ═══════════════════════════════════════════
+     MAIN CONTAINER  (mirrors .container)
+  ═══════════════════════════════════════════ */
+    .container {
+      width: 100%;
+      max-width: 960px;
+      background: var(--surface);
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+      padding: 44px 40px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 0 1px rgba(0, 255, 255, .05), 0 20px 60px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .04);
+    }
+
+    /* ── LEFT: CODE PANEL (mirrors .hangman-box) ── */
+    .code-panel {
+      flex-shrink: 0;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    .code-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .code-panel-title {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+    }
+
+    .lang-badge {
+      font-size: .65rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1.5px solid;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .lang-badge.js {
+      color: #f0db4f;
+      border-color: #f0db4f;
+    }
+
+    .lang-badge.python {
+      color: #3cba54;
+      border-color: #3cba54;
+    }
+
+    .lang-badge.cpp {
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .lang-badge.html {
+      color: #e44d26;
+      border-color: #e44d26;
+    }
+
+    .code-block {
+      background: #000;
+      border-radius: 10px;
+      padding: 20px 18px;
+      border-left: 4px solid var(--yellow);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .92rem;
+      line-height: 1.7;
+      color: #d1d1d1;
+      white-space: pre;
+      overflow-x: auto;
+      flex: 1;
+      min-height: 200px;
+    }
+
+    /* syntax highlighting colours */
+    .kw {
+      color: #cc99cd;
+    }
+
+    /* keyword */
+    .fn {
+      color: #6fb3d2;
+    }
+
+    /* function */
+    .str {
+      color: #7ec699;
+    }
+
+    /* string */
+    .num {
+      color: #f08d49;
+    }
+
+    /* number */
+    .cm {
+      color: #5c6370;
+      font-style: italic;
+    }
+
+    /* comment */
+    .op {
+      color: #67cdcc;
+    }
+
+    /* operator */
+    .ln {
+      color: #4a4a5a;
+      user-select: none;
+      margin-right: 14px;
+      display: inline-block;
+      width: 18px;
+      text-align: right;
+    }
+
+    /* Score + stats  (mirrors .score-display / .session-stats) */
+    .score-display {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 20px;
+      text-align: center;
+    }
+
+    .score-label {
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .score-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--yellow);
+      text-shadow: 0 0 12px rgba(204, 255, 0, .6);
+    }
+
+    .session-stats {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .stat-chip {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      text-align: center;
+    }
+
+    .stat-chip .s-label {
+      font-size: .6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .stat-chip .s-val {
+      font-family: 'Orbitron', monospace;
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    /* Level progress bar */
+    .level-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .level-bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: .68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .level-bar-track {
+      height: 6px;
+      background: rgba(255, 255, 255, .08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .level-bar-fill {
+      height: 100%;
+      background: var(--yellow);
+      border-radius: 99px;
+      transition: width .5s ease;
+      box-shadow: 0 0 6px var(--yellow);
+    }
+
+    /* ── RIGHT: GAME BOX (mirrors .game-box) ── */
+    .game-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Q counter */
+    .q-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .q-counter {
+      font-size: .72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    .diff-badge {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      padding: 4px 12px;
+      border-radius: 99px;
+      border: 1.5px solid;
+    }
+
+    .diff-badge.easy {
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .diff-badge.medium {
+      color: var(--yellow);
+      border-color: var(--yellow);
+    }
+
+    .diff-badge.hard {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    /* Question text */
+    .question-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    /* Options */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background: rgba(255, 255, 255, .04);
+      border: 1.5px solid rgba(0, 255, 255, .22);
+      color: var(--text);
+      padding: 14px 18px;
+      text-align: left;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .18s;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .88rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .option-btn .opt-label {
+      font-family: 'Orbitron', monospace;
+      font-size: .7rem;
+      font-weight: 900;
+      color: var(--cyan);
+      min-width: 18px;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: rgba(0, 255, 255, .07);
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 255, 255, .18);
+      transform: translateX(3px);
+    }
+
+    .option-btn.correct {
+      background: rgba(57, 255, 20, .12);
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 16px rgba(57, 255, 20, .3);
+      animation: popIn .3s ease;
+    }
+
+    .option-btn.wrong {
+      background: rgba(255, 68, 68, .1);
+      border-color: var(--red);
+      color: var(--red);
+      box-shadow: 0 0 14px rgba(255, 68, 68, .25);
+      animation: shake .3s ease;
+    }
+
+    .option-btn:disabled {
+      cursor: not-allowed;
+      opacity: .6;
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(1)
+      }
+
+      40% {
+        transform: scale(1.03)
+      }
+
+      100% {
+        transform: scale(1)
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      25% {
+        transform: translateX(-5px)
+      }
+
+      75% {
+        transform: translateX(5px)
+      }
+    }
+
+    /* Feedback strip */
+    .feedback-strip {
+      margin-top: 18px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: .82rem;
+      line-height: 1.6;
+      display: none;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .feedback-strip.show {
+      display: block;
+    }
+
+    .feedback-strip.ok {
+      background: rgba(57, 255, 20, .06);
+      border: 1px solid rgba(57, 255, 20, .25);
+      color: var(--green);
+    }
+
+    .feedback-strip.err {
+      background: rgba(255, 68, 68, .06);
+      border: 1px solid rgba(255, 68, 68, .25);
+      color: var(--red);
+    }
+
+    .feedback-label {
+      font-weight: 700;
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    /* Next button */
+    .next-btn {
+      margin-top: 22px;
+      padding: 12px 28px;
+      border: 2px solid var(--cyan);
+      background: transparent;
+      color: var(--cyan);
+      font-size: .9rem;
+      font-weight: 700;
+      border-radius: 7px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      transition: all .2s;
+      display: none;
+      align-self: flex-end;
+    }
+
+    .next-btn.show {
+      display: block;
+    }
+
+    .next-btn:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 18px rgba(0, 255, 255, .5);
+    }
+
+    /* Idle overlay (before game starts) */
+    .idle-prompt {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 14px;
+      padding: 30px 0;
+    }
+
+    .idle-prompt .ip-icon {
+      font-size: 3rem;
+    }
+
+    .idle-prompt .ip-text {
+      font-size: .95rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .idle-prompt .ip-arrow {
+      font-size: .8rem;
+      color: rgba(0, 255, 255, .4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════
+     MODALS  (identical structure to hangman)
+  ═══════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, .75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: var(--surface);
+      width: min(100%, 480px);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(0, 255, 255, .06), 0 30px 80px rgba(0, 0, 0, .6);
+      transform: scale(.9);
+      transition: transform .3s;
+    }
+
+    .modal-overlay.show .modal-box {
+      transform: scale(1);
+      animation: popIn .3s ease;
+    }
+
+    .modal-emoji {
+      font-size: 4.5rem;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .modal-title.win {
+      color: var(--yellow);
+      text-shadow: 0 0 20px rgba(204, 255, 0, .6);
+    }
+
+    .modal-title.lose {
+      color: var(--red);
+      text-shadow: 0 0 20px rgba(255, 68, 68, .5);
+    }
+
+    .modal-title.timeout {
+      color: var(--orange);
+      text-shadow: 0 0 20px rgba(255, 140, 0, .5);
+    }
+
+    .modal-sub {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .score-earned-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 24px;
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    .se-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .se-row span:last-child {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .se-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 8px 0;
+    }
+
+    .se-total {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      color: var(--yellow);
+      font-weight: 700;
+      text-shadow: 0 0 12px rgba(204, 255, 0, .5);
+    }
+
+    .modal-btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 12px 28px;
+      border: 2px solid var(--cyan);
+      background: transparent;
+      color: var(--cyan);
+      font-size: .9rem;
+      font-weight: 700;
+      border-radius: 7px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-primary:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 18px rgba(0, 255, 255, .5);
+    }
+
+    .btn-secondary {
+      padding: 12px 24px;
+      border: 2px solid var(--yellow);
+      background: transparent;
+      color: var(--yellow);
+      font-size: .9rem;
+      font-weight: 700;
+      border-radius: 7px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-secondary:hover {
+      background: var(--yellow);
+      color: #000;
+      box-shadow: 0 0 18px rgba(204, 255, 0, .5);
+    }
+
+    /* ═══════════════════════════════════════════
+     RESPONSIVE  (mirrors hangman breakpoints)
+  ═══════════════════════════════════════════ */
+    @media(max-width:760px) {
+      .container {
+        flex-direction: column;
+        padding: 24px 16px;
+        gap: 24px;
+      }
+
+      .code-panel {
+        width: 100%;
+      }
+
+      .site-header {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .controls-strip {
+        gap: 14px;
+      }
+    }
+
+    @media(max-width:480px) {
+      .container {
+        padding: 18px 12px;
+      }
+
+      .code-block {
+        font-size: .78rem;
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+     STATUS BAR  (replaces controls-strip)
+  ═══════════════════════════════════════════ */
+    .status-bar {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      margin-bottom: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .status-pill {
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 4px 13px;
+      border-radius: 99px;
+      background: rgba(0, 255, 255, .07);
+      border: 1.5px solid rgba(0, 255, 255, .25);
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .status-pill.muted {
+      background: rgba(255, 255, 255, .04);
+      border-color: rgba(255, 255, 255, .1);
+      color: var(--muted);
+    }
+
+    .change-btn {
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+      border: 1.5px solid rgba(204, 255, 0, .3);
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      transition: all .2s;
+    }
+
+    .change-btn:hover {
+      background: rgba(204, 255, 0, .08);
+      border-color: var(--yellow);
+    }
+
+    /* ═══════════════════════════════════════════
+     SETUP WIZARD  (inside .game-box)
+  ═══════════════════════════════════════════ */
+    .wizard-step {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      padding: 8px 0;
+      animation: wzIn .3s ease;
+    }
+
+    .wizard-step.active {
+      display: flex;
+    }
+
+    @keyframes wzIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .wz-label {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .wz-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      letter-spacing: .04em;
+      color: var(--text);
+      margin-top: -8px;
+    }
+
+    .wz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .wz-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      padding: 18px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      text-align: left;
+      transition: all .18s;
+    }
+
+    .wz-btn:hover {
+      border-color: var(--cyan);
+      background: rgba(0, 255, 255, .05);
+      box-shadow: 0 0 20px rgba(0, 255, 255, .12);
+      transform: translateY(-2px);
+    }
+
+    .wz-icon {
+      font-family: 'Orbitron', monospace;
+      font-size: .75rem;
+      font-weight: 900;
+      color: var(--cyan);
+      letter-spacing: .05em;
+    }
+
+    .wz-name {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: .02em;
+    }
+
+    .wz-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Difficulty colour overrides */
+    .wz-btn.diff-easy:hover {
+      border-color: var(--green);
+      box-shadow: 0 0 20px rgba(57, 255, 20, .15);
+    }
+
+    .wz-btn.diff-easy .wz-icon {
+      color: var(--green);
+    }
+
+    .wz-btn.diff-medium:hover {
+      border-color: var(--yellow);
+      box-shadow: 0 0 20px rgba(204, 255, 0, .15);
+    }
+
+    .wz-btn.diff-medium .wz-icon {
+      color: var(--yellow);
+    }
+
+    .wz-btn.diff-hard:hover {
+      border-color: var(--red);
+      box-shadow: 0 0 20px rgba(255, 68, 68, .15);
+    }
+
+    .wz-btn.diff-hard .wz-icon {
+      color: var(--red);
+    }
+
+    .wz-back {
+      align-self: flex-start;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      transition: all .18s;
+      letter-spacing: .04em;
+    }
+
+    .wz-back:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* ─── wizard inside code-panel: hide unused items until game starts ─── */
+    .code-panel.setup-mode .score-display,
+    .code-panel.setup-mode .session-stats,
+    .code-panel.setup-mode .level-bar-wrap {
+      opacity: .35;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════
+     HEADER
+══════════════════════════════════ -->
+  <header class="site-header">
+    <a class="logo-text" href="../index.html">
+      <span class="code">Code</span><span class="arena">Arena</span>
+    </a>
+    <div class="header-actions">
+      <a class="btn-nav" href="../hangmanPage/hangman.html">⌨ Hangman</a>
+      <a class="btn-nav" href="../Tictactoe/index.html">⊞ Tic Tac Toe</a>
+      <a class="btn-lb" href="../leaderboard.html">🏆 Leaderboard</a>
+      <div class="ca-auth-target"></div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════
+     STATUS BAR (shown after setup)
+══════════════════════════════════ -->
+  <div class="status-bar" id="statusBar" style="display:none">
+    <div class="status-pills">
+      <span class="status-pill cyan" id="statusLang">JS</span>
+      <span class="status-pill" id="statusDiff">Easy · 45s</span>
+      <span class="status-pill muted" id="statusQ">Q 1/5</span>
+    </div>
+    <button class="change-btn" id="changeSetupBtn">⚙ Change Setup</button>
+  </div>
+
+  <!-- ══════════════════════════════════
+     TIMER
+══════════════════════════════════ -->
+  <div class="timer-section">
+    <span class="timer-label">⏱ Time</span>
+    <div class="timer-bar-wrap">
+      <div class="timer-bar-fill" id="timerFill"></div>
+    </div>
+    <span class="timer-count" id="timerCount">—</span>
+  </div>
+
+  <!-- ══════════════════════════════════
+     MAIN CONTAINER
+══════════════════════════════════ -->
+  <div class="container">
+
+    <!-- LEFT: CODE PANEL -->
+    <div class="code-panel setup-mode" id="codePanel">
+
+      <div class="code-panel-header">
+        <span class="code-panel-title">Code Snippet</span>
+        <span class="lang-badge js" id="langBadge">JS</span>
+      </div>
+
+      <div class="code-block" id="codeBlock">← Pick a language &amp; difficulty to start!</div>
+
+      <div class="score-display">
+        <div class="score-label">Session Score</div>
+        <div class="score-value" id="liveScore">0</div>
+      </div>
+
+      <div class="session-stats">
+        <div class="stat-chip">
+          <div class="s-label">Correct</div>
+          <div class="s-val" id="statCorrect">0</div>
+        </div>
+        <div class="stat-chip">
+          <div class="s-label">Streak</div>
+          <div class="s-val" id="statStreak">0</div>
+        </div>
+        <div class="stat-chip">
+          <div class="s-label">Best</div>
+          <div class="s-val" id="statBest">0</div>
+        </div>
+      </div>
+
+      <div class="level-bar-wrap">
+        <div class="level-bar-header">
+          <span id="levelLabel">Level 1</span>
+          <span id="levelProgress">0 / 5</span>
+        </div>
+        <div class="level-bar-track">
+          <div class="level-bar-fill" id="levelFill" style="width:0%"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: GAME BOX -->
+    <div class="game-box">
+
+      <div class="q-meta">
+        <span class="q-counter" id="qCounter">Question — / —</span>
+        <span class="diff-badge easy" id="diffBadge">Easy</span>
+      </div>
+
+      <div id="gameArea">
+
+        <!-- ── STEP 1: Language ── -->
+        <div class="wizard-step active" id="step-lang">
+          <div class="wz-label">Step 1 of 2</div>
+          <div class="wz-title">Choose a Language</div>
+          <div class="wz-options">
+            <button class="wz-btn" data-lang="javascript">
+              <span class="wz-icon">JS</span>
+              <span class="wz-name">JavaScript</span>
+              <span class="wz-sub">Closures, coercion, async</span>
+            </button>
+            <button class="wz-btn" data-lang="python">
+              <span class="wz-icon">PY</span>
+              <span class="wz-name">Python</span>
+              <span class="wz-sub">Scoping, typing, iterators</span>
+            </button>
+            <button class="wz-btn" data-lang="cpp">
+              <span class="wz-icon">C++</span>
+              <span class="wz-name">C++</span>
+              <span class="wz-sub">Pointers, templates, UB</span>
+            </button>
+            <button class="wz-btn" data-lang="html">
+              <span class="wz-icon">CSS</span>
+              <span class="wz-name">HTML / CSS</span>
+              <span class="wz-sub">Specificity, box model, flex</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── STEP 2: Difficulty ── -->
+        <div class="wizard-step" id="step-diff">
+          <button class="wz-back" id="backToLang">← Back</button>
+          <div class="wz-label">Step 2 of 2</div>
+          <div class="wz-title">Choose Difficulty</div>
+          <div class="wz-options">
+            <button class="wz-btn diff-easy" data-diff="easy">
+              <span class="wz-icon">🟢</span>
+              <span class="wz-name">Easy</span>
+              <span class="wz-sub">45 seconds per question</span>
+            </button>
+            <button class="wz-btn diff-medium" data-diff="medium">
+              <span class="wz-icon">🟡</span>
+              <span class="wz-name">Medium</span>
+              <span class="wz-sub">30 seconds per question</span>
+            </button>
+            <button class="wz-btn diff-hard" data-diff="hard">
+              <span class="wz-icon">🔴</span>
+              <span class="wz-name">Hard</span>
+              <span class="wz-sub">18 seconds · max points</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div><!-- /container -->
+
+  <!-- ══════════════════════════════════
+     RESULT MODAL
+══════════════════════════════════ -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-box">
+      <div class="modal-emoji" id="modalEmoji">🎉</div>
+      <div class="modal-title win" id="modalTitle">Round Complete!</div>
+      <div class="modal-sub" id="modalSub">You answered all 5 questions.</div>
+
+      <div class="score-earned-block" id="scoreBlock">
+        <div class="se-row"><span>Correct Answers</span><span id="seCorrect">0 / 5</span></div>
+        <div class="se-row"><span>Avg. Time Bonus</span><span id="seTime">+0</span></div>
+        <div class="se-row"><span>Streak Bonus</span><span id="seStreak">+0</span></div>
+        <hr class="se-divider">
+        <div class="se-total" id="seTotal">0 pts</div>
+      </div>
+
+      <div class="modal-btn-row">
+        <button class="btn-primary" id="playAgainBtn">▶ Play Again</button>
+        <a class="btn-secondary" href="../leaderboard.html">🏆 Leaderboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+     TIMEOUT MODAL
+══════════════════════════════════ -->
+  <div class="modal-overlay" id="timeoutModal">
+    <div class="modal-box">
+      <div class="modal-emoji">⏰</div>
+      <div class="modal-title timeout">Time's Up!</div>
+      <div class="modal-sub" id="timeoutSub">The answer was: <b id="correctAnswer" style="color:var(--cyan)"></b></div>
+      <div class="modal-btn-row">
+        <button class="btn-primary" id="timeoutNextBtn">→ Next Question</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ══════════════════════════════════════════════════════
+       QUESTION BANK
+    ══════════════════════════════════════════════════════ */
+
+    const QUESTIONS = {
+      javascript: {
+        easy: [
+          { code: `let x = 5;\nconsole.log(x + "3");`, answer: "53", options: ["8", "53", "\"53\"", "Error"], explain: "JS coerces the number to a string when using + with a string." },
+          { code: `console.log(typeof null);`, answer: "object", options: ["null", "object", "undefined", "string"], explain: "typeof null === 'object' is a famous JS bug inherited from ES1." },
+          { code: `let a = [];\nconsole.log(typeof a);`, answer: "object", options: ["array", "object", "undefined", "list"], explain: "Arrays are objects in JS. Use Array.isArray() to check." },
+          { code: `console.log(0 == false);`, answer: "true", options: ["true", "false", "undefined", "Error"], explain: "Loose equality (==) coerces 0 and false both to 0." },
+          { code: `console.log(2 ** 3);`, answer: "8", options: ["6", "8", "9", "Error"], explain: "** is the exponentiation operator. 2 to the power of 3 = 8." },
+          { code: `let s = "hello";\nconsole.log(s.length);`, answer: "5", options: ["4", "5", "6", "undefined"], explain: ".length returns the number of UTF-16 code units in the string." },
+          { code: `console.log(1 + 2 + "3");`, answer: "33", options: ["123", "33", "6", "Error"], explain: "Left to right: 1+2=3, then 3+\"3\"=\"33\" via string coercion." },
+        ],
+        medium: [
+          { code: `console.log([] + []);`, answer: "\"\"", options: ["[]", "\"\"", "0", "undefined"], explain: "Both arrays convert to empty strings, concatenated → \"\"." },
+          { code: `let x = 10;\n(function() {\n  console.log(x);\n  var x = 20;\n})();`, answer: "undefined", options: ["10", "20", "undefined", "Error"], explain: "var is hoisted to the top of the IIFE scope — declaration hoisted, not the assignment." },
+          { code: `console.log(0.1 + 0.2 === 0.3);`, answer: "false", options: ["true", "false", "NaN", "Error"], explain: "Floating-point precision: 0.1+0.2 = 0.30000000000000004, not exactly 0.3." },
+          { code: `const arr = [1, 2, 3];\narr.push(4);\nconsole.log(arr.length);`, answer: "4", options: ["3", "4", "5", "Error"], explain: "push() adds to end; length becomes 4." },
+          { code: `console.log(\"5\" - 3);`, answer: "2", options: ["53", "\"53\"", "2", "NaN"], explain: "Minus operator always coerces to number: '5'→5, 5-3=2." },
+          { code: `let a = {n:1};\nlet b = a;\nb.n = 2;\nconsole.log(a.n);`, answer: "2", options: ["1", "2", "undefined", "Error"], explain: "Objects are reference types. a and b point to the same object." },
+          { code: `console.log(!!\"\" + !!\"hello\");`, answer: "1", options: ["0", "1", "2", "true"], explain: "!!'' = false(0), !!'hello' = true(1). false+true = 1." },
+        ],
+        hard: [
+          { code: `for (var i=0;i<3;i++) {}\nconsole.log(i);`, answer: "3", options: ["2", "3", "undefined", "Error"], explain: "var is function-scoped; i leaks out of the for loop." },
+          { code: `console.log(typeof undefined == typeof NULL);`, answer: "true", options: ["true", "false", "Error", "ReferenceError"], explain: "typeof undefined='undefined', NULL is undefined var → typeof NULL='undefined'. Equal." },
+          { code: `[1,2,3].map(Number.parseInt);\n// result?`, answer: "[1,NaN,NaN]", options: ["[1,2,3]", "[1,NaN,NaN]", "[NaN,NaN,NaN]", "Error"], explain: "map passes (value, index, arr). parseInt(1,0)=1, parseInt(2,1)=NaN, parseInt(3,2)=NaN." },
+          { code: `const fn = () => arguments;\nfn();`, answer: "ReferenceError", options: ["{}", "[]", "ReferenceError", "undefined"], explain: "Arrow functions have no own 'arguments' object. Throws ReferenceError." },
+          { code: `console.log(+true + +\"\" + +false);`, answer: "1", options: ["0", "1", "NaN", "\"\""], explain: "+true=1, +\"\"=0, +false=0. Total: 1." },
+          { code: `let x = 1;\nlet y = (x++, x);\nconsole.log(y);`, answer: "2", options: ["1", "2", "undefined", "NaN"], explain: "Comma operator evaluates left, returns right. x++ increments x to 2, y=x=2." },
+        ]
+      },
+      python: {
+        easy: [
+          { code: `x = 10\ny = 3\nprint(x // y)`, answer: "3", options: ["3.33", "3", "4", "Error"], explain: "// is floor division. 10//3 = 3 (integer part only)." },
+          { code: `print(type([]))`, answer: "<class 'list'>", options: ["list", "<class 'list'>", "array", "Error"], explain: "type() returns the class object representation." },
+          { code: `s = \"hello\"\nprint(s[-1])`, answer: "o", options: ["h", "o", "Error", "None"], explain: "Negative indexing: s[-1] is the last character." },
+          { code: `print(bool(0))`, answer: "False", options: ["True", "False", "0", "None"], explain: "0 is falsy in Python. bool(0) returns False." },
+          { code: `print(2 ** 10)`, answer: "1024", options: ["20", "200", "1024", "Error"], explain: "** is exponentiation. 2^10 = 1024." },
+          { code: `a = [1, 2, 3]\nprint(a[1:3])`, answer: "[2, 3]", options: ["[1,2]", "[2,3]", "[1,2,3]", "Error"], explain: "Slice a[1:3] returns index 1 up to (not including) 3." },
+          { code: `print(\"ab\" * 3)`, answer: "ababab", options: ["ab3", "ababab", "Error", "6"], explain: "String repetition: 'ab' repeated 3 times." },
+        ],
+        medium: [
+          { code: `a = [1,2,3]\nb = a\nb.append(4)\nprint(len(a))`, answer: "4", options: ["3", "4", "Error", "None"], explain: "Lists are mutable reference types. b and a point to the same list." },
+          { code: `def f(x=[]):\n    x.append(1)\n    return x\nprint(f(), f())`, answer: "[1] [1, 1]", options: ["[1] [1]", "[1] [1,1]", "[1] [1, 1]", "Error"], explain: "Mutable default argument is shared across calls — classic Python gotcha." },
+          { code: `print({1,2,2,3})`, answer: "{1, 2, 3}", options: ["{1,2,2,3}", "{1, 2, 3}", "[1,2,3]", "Error"], explain: "Sets remove duplicates automatically." },
+          { code: `x = 5\ndef f():\n    x = 10\nf()\nprint(x)`, answer: "5", options: ["10", "5", "None", "Error"], explain: "Local x inside f() doesn't affect global x." },
+          { code: `print(list(map(str,[1,2,3])))`, answer: "['1','2','3']", options: ["[1,2,3]", "['1','2','3']", "(1,2,3)", "Error"], explain: "map applies str to each element; list() wraps the result." },
+          { code: `d = {'a':1,'b':2}\nprint(d.get('c', 0))`, answer: "0", options: ["None", "0", "Error", "KeyError"], explain: ".get(key, default) returns default when key is absent." },
+        ],
+        hard: [
+          { code: `print(0.1 + 0.2 == 0.3)`, answer: "False", options: ["True", "False", "Error", "0.3"], explain: "IEEE 754 float precision: 0.1+0.2 = 0.30000000000000004." },
+          { code: `a = (1,)\nb = (1)\nprint(type(a)==type(b))`, answer: "False", options: ["True", "False", "Error", "TypeError"], explain: "(1) is just int 1. (1,) with a trailing comma is a tuple." },
+          { code: `x = [i**2 for i in range(4) if i%2==0]\nprint(x)`, answer: "[0, 4]", options: ["[0,4]", "[0,1,4,9]", "[0, 4]", "[4]"], explain: "Filters even i (0,2), squares them: [0, 4]." },
+          { code: `class A:\n    x=1\na1=A()\na1.x=2\nprint(A.x)`, answer: "1", options: ["1", "2", "None", "Error"], explain: "Setting a1.x creates an instance attribute; the class attribute A.x stays 1." },
+          { code: `gen=(x for x in range(3))\nnext(gen)\nprint(list(gen))`, answer: "[1, 2]", options: ["[0,1,2]", "[1,2]", "[1, 2]", "Error"], explain: "next() consumes 0; list() drains the rest: [1, 2]." },
+        ]
+      },
+      cpp: {
+        easy: [
+          { code: `#include<iostream>\nusing namespace std;\nint main(){\n    cout<<5/2;\n}`, answer: "2", options: ["2.5", "2", "3", "Error"], explain: "Integer division in C++: 5/2 = 2 (truncated)." },
+          { code: `cout<<true<<\" \"<<false;`, answer: "1 0", options: ["true false", "1 0", "1 1", "Error"], explain: "C++ prints bool as 1 (true) or 0 (false) by default." },
+          { code: `int a=10;\nint b=a++;\ncout<<a<<\" \"<<b;`, answer: "11 10", options: ["10 10", "11 11", "11 10", "10 11"], explain: "Post-increment: b gets the old value (10), then a becomes 11." },
+          { code: `cout<<sizeof(char);`, answer: "1", options: ["1", "2", "4", "8"], explain: "sizeof(char) is always 1 byte by the C++ standard." },
+          { code: `int x=7;\ncout<<(x%3);`, answer: "1", options: ["2", "1", "0", "Error"], explain: "7 mod 3 = 1. The modulus operator returns the remainder." },
+          { code: `string s=\"hello\";\ncout<<s.size();`, answer: "5", options: ["4", "5", "6", "Error"], explain: ".size() returns the number of characters: 5." },
+        ],
+        medium: [
+          { code: `int x=5,y=10;\ncout<<(x>y?x:y);`, answer: "10", options: ["5", "10", "true", "Error"], explain: "Ternary: x>y is false, so y (10) is returned." },
+          { code: `int a=1;\ncout<<(a<<2);`, answer: "4", options: ["3", "4", "8", "Error"], explain: "Left shift by 2: 1 << 2 = 4 (multiplies by 2^2)." },
+          { code: `void f(int &x){x=99;}\nint n=1;\nf(n);\ncout<<n;`, answer: "99", options: ["1", "99", "Error", "0"], explain: "Pass by reference — f modifies the original variable n." },
+          { code: `int arr[]={1,2,3};\ncout<<arr[3];`, answer: "Undefined Behavior", options: ["0", "Undefined Behavior", "Error", "3"], explain: "Accessing arr[3] is out of bounds — undefined behavior in C++." },
+          { code: `int x=5;\ncout<<++x<<\" \"<<x++;`, answer: "6 6", options: ["6 6", "6 7", "7 6", "Error"], explain: "++x pre-increments x to 6 (prints 6), x++ prints current x (6) then increments." },
+        ],
+        hard: [
+          { code: `int* p=nullptr;\n*p=5;\ncout<<*p;`, answer: "Segmentation Fault", options: ["5", "0", "Segmentation Fault", "Error"], explain: "Dereferencing nullptr causes a segfault at runtime." },
+          { code: `int x=0;\ncout<<(x++||++x);`, answer: "1", options: ["0", "1", "2", "Error"], explain: "Short-circuit: x++ yields 0 (falsy) so ++x runs (x=2), evaluates to true (1)." },
+          { code: `template<class T>\nT add(T a,T b){return a+b;}\ncout<<add(1,2.0);`, answer: "Compile Error", options: ["3", "3.0", "Compile Error", "3.00"], explain: "Template deduction fails: T can't be both int and double simultaneously." },
+          { code: `class A{public: A(){cout<<\"A\";} ~A(){cout<<\"D\";}};\nA a;`, answer: "AD", options: ["A", "AD", "DA", "Error"], explain: "Constructor prints A on creation, destructor prints D when object goes out of scope." },
+          { code: `int x=5;\nint y=x+++x;\ncout<<y;`, answer: "10", options: ["10", "11", "Error", "Undefined"], explain: "Parsed as (x++) + x: old x(5) + x(6) = 11… actually 5+5=10 before increment." },
+        ]
+      },
+      html: {
+        easy: [
+          { code: `<!-- Which tag creates\n     a hyperlink? -->`, answer: "<a>", options: ["<link>" ,"<a>" ,"<href>" ,"<url>"], explain: "<a href='...'> is the anchor tag used for hyperlinks." },
+          { code: `<p style=\"color:red\">Hi</p>\n<!-- text color? -->`, answer: "red", options: ["blue", "red", "white", "default"], explain: "The inline style sets the color property to red." },
+          { code: `<div style=\"display:flex\">\n  <!-- children use? -->\n</div>`, answer: "flexbox", options: ["block", "flexbox", "grid", "inline"], explain: "display:flex makes children flex items arranged by flexbox rules." },
+          { code: `<!-- Which property centers\n     a flex child? -->\nalign-items: ???`, answer: "center", options: ["middle", "center", "auto", "flex-center"], explain: "align-items:center vertically centers children in a flex container." },
+          { code: `h1 { font-size: 2em; }\n<!-- 1em = 16px, so h1 is? -->`, answer: "32px", options: ["16px", "2px", "32px", "64px"], explain: "2em × 16px base = 32px." },
+          { code: `<!-- Which tag is\n     block-level? -->`, answer: "<div>", options: ["<span>", "<a>", "<div>", "<img>"], explain: "<div> is a block-level element; the others listed are inline." },
+        ],
+        medium: [
+          { code: `.box {\n  margin: 10px 20px;\n}\n<!-- top margin? -->`, answer: "10px", options: ["20px", "10px", "0px", "15px"], explain: "Shorthand margin: top/bottom = 10px, left/right = 20px." },
+          { code: `.box {\n  position:absolute;\n  top:10px;\n  left:20px;\n}\n<!-- positioned relative to? -->`, answer: "nearest positioned ancestor", options: ["body", "viewport", "nearest positioned ancestor", "parent div"], explain: "position:absolute positions relative to the nearest ancestor with a position value." },
+          { code: `<!-- What does z-index do? -->\n.a{z-index:2}\n.b{z-index:1}`, answer: ".a is on top", options: [".b is on top", ".a is on top", "no difference", "Error"], explain: "Higher z-index stacks the element above lower z-index siblings." },
+          { code: `.flex{\n  display:flex;\n  justify-content:space-between;\n}\n<!-- 3 children gap? -->`, answer: "equal gaps between", options: ["all centered", "equal gaps between", "bunched left", "Error"], explain: "space-between places equal space between items, first and last at edges." },
+          { code: `<!-- CSS specificity:\n     #id vs .class -->`, answer: "#id wins", options: [".class wins", "#id wins", "both equal", "depends"], explain: "ID selectors (0,1,0,0) always beat class selectors (0,0,1,0) in specificity." },
+        ],
+        hard: [
+          { code: `<!-- What is the\n     box model order\n     inside → out? -->`, answer: "content → padding → border → margin", options: ["margin→border→padding→content", "content→padding→border→margin", "content→border→padding→margin", "padding→content→border→margin"], explain: "CSS box model from inside out: content, padding, border, margin." },
+          { code: `.a { color: red; }\ndiv .a { color: blue; }\n<!-- <div><p class=\"a\">\n     which color? -->`, answer: "blue", options: ["red", "blue", "depends", "Error"], explain: "div .a (specificity 0,0,1,1) beats .a (0,0,1,0), so blue wins." },
+          { code: `<!-- grid-column: 1 / 3;\n     in a 3-col grid means? -->`, answer: "spans columns 1 and 2", options: ["col 1 only", "cols 1 to 3", "spans columns 1 and 2", "col 3 only"], explain: "1 / 3 means start at line 1, end at line 3 — spanning columns 1 and 2." },
+          { code: `<!-- Which CSS value makes\n     an element invisible\n     but still take up space? -->`, answer: "visibility:hidden", options: ["display:none", "opacity:1", "visibility:hidden", "overflow:hidden"], explain: "visibility:hidden hides visually but preserves layout space. display:none removes from flow." },
+          { code: `<!-- What does\n     transform:translateZ(0)\n     do? -->`, answer: "creates a new stacking context", options: ["moves element to back", "creates a new stacking context", "rotates element", "Error"], explain: "translateZ(0) promotes element to its own compositor layer / stacking context." },
+        ]
+      }
+    };
+
+    /* ══════════════════════════════════════════════════════
+       DIFF CONFIG
+    ══════════════════════════════════════════════════════ */
+    const DIFF_CFG = {
+      easy: { time: 45, base: 100, timeBonus: 2, streakMult: 5 },
+      medium: { time: 30, base: 200, timeBonus: 4, streakMult: 10 },
+      hard: { time: 18, base: 400, timeBonus: 8, streakMult: 20 }
+    };
+
+    const QUESTIONS_PER_ROUND = 5;
+
+    /* ══════════════════════════════════════════════════════
+       STATE
+    ══════════════════════════════════════════════════════ */
+    let currentLang = null;
+    let currentDiff = null;
+    let gameStarted = false;
+
+    let questionPool = [];
+    let qIndex = 0;
+    let currentQ = null;
+    let answered = false;
+
+    let sessionScore = 0;
+    let sessionCorrect = 0;
+    let sessionStreak = 0;
+    let sessionBest = 0;
+    let sessionLevel = 1;
+    let levelProgress = 0;   // correct answers this level
+
+    let timerInterval = null;
+    let timeLeft = 0;
+    let totalTime = 0;
+
+    let roundCorrect = 0;
+    let roundTimeBonusTotal = 0;
+    let roundStreakBest = 0;
+
+    /* ══════════════════════════════════════════════════════
+       SETUP WIZARD FLOW
+    ══════════════════════════════════════════════════════ */
+    function showStep(id) {
+      document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    // Step 1 — Language pick
+    document.querySelectorAll('#step-lang .wz-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentLang = btn.dataset.lang;
+        // flash selected
+        document.querySelectorAll('#step-lang .wz-btn').forEach(b => b.style.borderColor = '');
+        btn.style.borderColor = 'var(--cyan)';
+        setTimeout(() => showStep('step-diff'), 180);
+      });
+    });
+
+    // Step 2 — Difficulty pick
+    document.querySelectorAll('#step-diff .wz-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentDiff = btn.dataset.diff;
+        updateDiffBadge();
+        // small flash then start
+        btn.style.transform = 'scale(0.96)';
+        setTimeout(() => { btn.style.transform = ''; launchGame(); }, 180);
+      });
+    });
+
+    // Back to Step 1
+    document.getElementById('backToLang').addEventListener('click', () => {
+      currentLang = null;
+      showStep('step-lang');
+    });
+
+    // Change setup (resets to wizard)
+    document.getElementById('changeSetupBtn').addEventListener('click', () => {
+      stopTimer();
+      gameStarted = false;
+      currentLang = null;
+      currentDiff = null;
+
+      // hide status bar, show wizard
+      document.getElementById('statusBar').style.display = 'none';
+      document.getElementById('timerCount').textContent = '—';
+      document.getElementById('timerFill').style.width = '100%';
+      document.getElementById('timerFill').classList.remove('warn', 'danger');
+      document.getElementById('timerCount').classList.remove('warn', 'danger');
+      document.getElementById('codeBlock').textContent = '← Pick a language & difficulty to start!';
+      document.getElementById('langBadge').textContent = 'JS';
+      document.getElementById('langBadge').className = 'lang-badge js';
+      document.getElementById('codePanel').classList.add('setup-mode');
+      document.getElementById('qCounter').textContent = 'Question — / —';
+
+      showStep('step-lang');
+      document.getElementById('gameArea').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    function launchGame() {
+      // reveal status bar, hide wizard dims
+      document.getElementById('statusBar').style.display = 'flex';
+      document.getElementById('codePanel').classList.remove('setup-mode');
+
+      // update status pills
+      const langLabels = { javascript: 'JavaScript', python: 'Python', cpp: 'C++', html: 'HTML/CSS' };
+      const diffLabels = { easy: 'Easy · 45s', medium: 'Medium · 30s', hard: 'Hard · 18s' };
+      document.getElementById('statusLang').textContent = langLabels[currentLang];
+      document.getElementById('statusDiff').textContent = diffLabels[currentDiff];
+
+      startRound();
+    }
+
+    function updateDiffBadge() {
+      const badge = document.getElementById('diffBadge');
+      badge.className = 'diff-badge ' + (currentDiff || 'easy');
+      badge.textContent = currentDiff ? currentDiff.charAt(0).toUpperCase() + currentDiff.slice(1) : 'Easy';
+    }
+
+    /* ══════════════════════════════════════════════════════
+       ROUND START
+    ══════════════════════════════════════════════════════ */
+    function startRound() {
+      stopTimer();
+      gameStarted = true;
+      qIndex = 0;
+      roundCorrect = 0;
+      roundTimeBonusTotal = 0;
+      roundStreakBest = 0;
+
+      // Shuffle and pick 5 questions
+      const pool = [...QUESTIONS[currentLang][currentDiff]];
+      shuffle(pool);
+      questionPool = pool.slice(0, QUESTIONS_PER_ROUND);
+
+      // Update lang badge
+      const langLabels = { javascript: 'JS', python: 'PY', cpp: 'C++', html: 'HTML' };
+      const badge = document.getElementById('langBadge');
+      badge.textContent = langLabels[currentLang];
+      badge.className = 'lang-badge ' + currentLang;
+
+      loadQuestion();
+    }
+
+    /* ══════════════════════════════════════════════════════
+       QUESTION RENDER
+    ══════════════════════════════════════════════════════ */
+    function loadQuestion() {
+      if (qIndex >= questionPool.length) { endRound(); return; }
+      currentQ = questionPool[qIndex];
+      answered = false;
+
+      // update status Q pill
+      document.getElementById('statusQ').textContent = `Q ${qIndex + 1} / ${QUESTIONS_PER_ROUND}`;
+
+      document.getElementById('qCounter').textContent = `Question ${qIndex + 1} / ${QUESTIONS_PER_ROUND}`;
+      document.getElementById('codeBlock').textContent = currentQ.code;
+
+      // Build options
+      const opts = shuffle([...currentQ.options]);
+      const labels = ['A', 'B', 'C', 'D'];
+
+      const gameArea = document.getElementById('gameArea');
+      gameArea.innerHTML = `
+    <div class="question-text">What is the output of this snippet?</div>
+    <div class="options-list" id="optsList">
+      ${opts.map((o, i) => `
+        <button class="option-btn" data-val="${escHtml(o)}">
+          <span class="opt-label">${labels[i]}</span>
+          ${escHtml(o)}
+        </button>`).join('')}
+    </div>
+    <div class="feedback-strip" id="feedback"></div>
+    <button class="next-btn" id="nextBtn">${qIndex + 1 < QUESTIONS_PER_ROUND ? 'Next Question →' : 'See Results →'}</button>
+  `;
+
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleAnswer(btn));
+      });
+      document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+
+      startTimer();
+    }
+
+    /* ══════════════════════════════════════════════════════
+       ANSWER HANDLING
+    ══════════════════════════════════════════════════════ */
+    function handleAnswer(btn) {
+      if (answered) return;
+      answered = true;
+      stopTimer();
+
+      const chosen = btn.dataset.val;
+      const correct = currentQ.answer;
+      const isCorrect = chosen === correct;
+
+      // Disable all options
+      document.querySelectorAll('.option-btn').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.val === correct) b.classList.add('correct');
+      });
+      if (!isCorrect) btn.classList.add('wrong');
+
+      // Score calc
+      const cfg = DIFF_CFG[currentDiff];
+      if (isCorrect) {
+        const tBonus = timeLeft * cfg.timeBonus;
+        const sBonus = sessionStreak * cfg.streakMult;
+        const earned = cfg.base + tBonus + sBonus;
+
+        sessionScore += earned;
+        sessionCorrect++;
+        sessionStreak++;
+        roundCorrect++;
+        roundTimeBonusTotal += tBonus;
+
+        if (sessionStreak > sessionBest) sessionBest = sessionStreak;
+        if (sessionStreak > roundStreakBest) roundStreakBest = sessionStreak;
+
+        levelProgress++;
+        if (levelProgress >= 5) { sessionLevel++; levelProgress = 0; }
+
+        showFeedback(true, `+${earned} pts  — ${currentQ.explain}`);
+      } else {
+        sessionStreak = 0;
+        showFeedback(false, `Correct: <b>${correct}</b> — ${currentQ.explain}`);
+      }
+
+      updateUI();
+      document.getElementById('nextBtn').classList.add('show');
+    }
+
+    /* ══════════════════════════════════════════════════════
+       FEEDBACK
+    ══════════════════════════════════════════════════════ */
+    function showFeedback(ok, msg) {
+      const f = document.getElementById('feedback');
+      f.classList.remove('ok', 'err');
+      f.innerHTML = `<span class="feedback-label">${ok ? '✓ Correct!' : '✗ Wrong!'}</span>${msg}`;
+      f.classList.add('show', ok ? 'ok' : 'err');
+    }
+
+    /* ══════════════════════════════════════════════════════
+       NEXT QUESTION
+    ══════════════════════════════════════════════════════ */
+    function nextQuestion() {
+      qIndex++;
+      loadQuestion();
+    }
+
+    /* ══════════════════════════════════════════════════════
+       TIMER
+    ══════════════════════════════════════════════════════ */
+    function startTimer() {
+      stopTimer();
+      totalTime = timeLeft = DIFF_CFG[currentDiff].time;
+      updateTimerUI();
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0) { clearInterval(timerInterval); onTimeout(); }
+      }, 1000);
+    }
+
+    function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+
+    function updateTimerUI() {
+      const fill = document.getElementById('timerFill');
+      const count = document.getElementById('timerCount');
+      const pct = totalTime > 0 ? (timeLeft / totalTime) * 100 : 100;
+      count.textContent = timeLeft + 's';
+      fill.style.width = pct + '%';
+      [fill, count].forEach(el => el.classList.remove('warn', 'danger'));
+      if (timeLeft <= 5) [fill, count].forEach(el => el.classList.add('danger'));
+      else if (timeLeft <= Math.floor(totalTime * .35)) [fill, count].forEach(el => el.classList.add('warn'));
+    }
+
+    function onTimeout() {
+      if (answered) return;
+      answered = true;
+      sessionStreak = 0;
+      document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.dataset.val === currentQ.answer) b.classList.add('correct'); });
+      document.getElementById('correctAnswer').textContent = currentQ.answer;
+      document.getElementById('timeoutSub').innerHTML = `The answer was: <b style="color:var(--cyan)">${escHtml(currentQ.answer)}</b><br><small style="color:var(--muted);font-size:.75rem">${currentQ.explain}</small>`;
+      document.getElementById('timeoutModal').classList.add('show');
+      document.getElementById('timeoutNextBtn').onclick = () => {
+        document.getElementById('timeoutModal').classList.remove('show');
+        nextQuestion();
+      };
+      updateUI();
+    }
+
+    /* ══════════════════════════════════════════════════════
+       END ROUND + SAVE TO LEADERBOARD
+    ══════════════════════════════════════════════════════ */
+    function endRound() {
+      stopTimer();
+      document.getElementById('timerCount').textContent = '—';
+      document.getElementById('timerFill').style.width = '100%';
+      document.getElementById('timerFill').classList.remove('warn', 'danger');
+
+      const cfg = DIFF_CFG[currentDiff];
+      const streakBonus = roundStreakBest * cfg.streakMult * 2;
+      const total = roundCorrect * cfg.base + roundTimeBonusTotal + streakBonus;
+
+      // Save to leaderboard
+      saveLBScore({
+        score: total,
+        word: `${currentLang.toUpperCase()} OUTPUT`,
+        category: currentLang,
+        difficulty: currentDiff,
+        date: new Date().toLocaleDateString(),
+        isoDate: new Date().toISOString(),
+        game: 'syntax',
+        player: (()=>{ try{ return JSON.parse(localStorage.getItem('codearena_user'))?.name || 'Anonymous'; }catch{return 'Anonymous';} })()
+
+      });
+
+      // Populate modal
+      const pct = Math.round((roundCorrect / QUESTIONS_PER_ROUND) * 100);
+      const emoji = roundCorrect === QUESTIONS_PER_ROUND ? '🏆' : roundCorrect >= 3 ? '🎯' : '💡';
+      const titleCls = roundCorrect >= 3 ? 'win' : 'lose';
+      const titleTxt = roundCorrect === QUESTIONS_PER_ROUND ? 'Perfect Round!' : roundCorrect >= 3 ? 'Round Complete!' : 'Keep Practising!';
+
+      document.getElementById('modalEmoji').textContent = emoji;
+      document.getElementById('modalTitle').textContent = titleTxt;
+      document.getElementById('modalTitle').className = 'modal-title ' + titleCls;
+      document.getElementById('modalSub').textContent = `${roundCorrect} / ${QUESTIONS_PER_ROUND} correct (${pct}%)`;
+      document.getElementById('seCorrect').textContent = `${roundCorrect} / ${QUESTIONS_PER_ROUND}`;
+      document.getElementById('seTime').textContent = `+${roundTimeBonusTotal}`;
+      document.getElementById('seStreak').textContent = `+${streakBonus}`;
+      document.getElementById('seTotal').textContent = `${total} pts`;
+
+      document.getElementById('playAgainBtn').onclick = () => {
+        document.getElementById('resultModal').classList.remove('show');
+        // Go back to language step for a fresh pick
+        document.getElementById('statusBar').style.display = 'none';
+        document.getElementById('codePanel').classList.add('setup-mode');
+        document.getElementById('codeBlock').textContent = '← Pick a language & difficulty to start!';
+        currentLang = null; currentDiff = null;
+        showStep('step-lang');
+      };
+
+      setTimeout(() => document.getElementById('resultModal').classList.add('show'), 400);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       LOCALSTORAGE  (compatible with leaderboard.html)
+    ══════════════════════════════════════════════════════ */
+    const LS_KEY = 'codearena_hangman_scores';   // shared key so leaderboard picks it up
+
+    function saveLBScore(entry) {
+      let scores = [];
+      try { scores = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { }
+      scores.push(entry);
+      scores.sort((a, b) => b.score - a.score);
+      scores.splice(50);
+      localStorage.setItem(LS_KEY, JSON.stringify(scores));
+    }
+
+    /* ══════════════════════════════════════════════════════
+       UI UPDATE
+    ══════════════════════════════════════════════════════ */
+    function updateUI() {
+      document.getElementById('liveScore').textContent = sessionScore;
+      document.getElementById('statCorrect').textContent = sessionCorrect;
+      document.getElementById('statStreak').textContent = sessionStreak;
+      document.getElementById('statBest').textContent = sessionBest;
+      document.getElementById('levelLabel').textContent = `Level ${sessionLevel}`;
+      document.getElementById('levelProgress').textContent = `${levelProgress} / 5`;
+      const pct = (levelProgress / 5) * 100;
+      document.getElementById('levelFill').style.width = pct + '%';
+    }
+
+    /* ══════════════════════════════════════════════════════
+       HELPERS
+    ══════════════════════════════════════════════════════ */
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Close modals on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); });
+    });
+  </script>
+</body>
+
+</html>
