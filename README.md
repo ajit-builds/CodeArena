@@ -75,44 +75,6 @@ Score is calculated based on performance
 
 Leaderboard updates with the new ranking
 
-🖥 Project Structure
-CodeArena/
-│
-├── index.html
-├── style.css
-├── script.js
-│
-├── games/
-│   ├── hangman/
-│   ├── syntax-reveal/
-│   ├── mcq-quiz/
-│   └── tic-tac-toe/
-│
-├── leaderboard.html
-├── gamebuilder.html
-│
-└── assets/
-📷 Screenshots
-Landing Page
-
-Arcade-style coding platform interface.
-
-Coding Hangman
-
-Programming vocabulary guessing game.
-
-MCQ Coding Quiz
-
-Multiple-choice programming questions.
-
-CSS Tic Tac Toe
-
-Interactive layout learning game.
-
-Game Builder
-
-Create and publish custom coding challenges.
-
 🎯 Objective
 
 The goal of this project is to demonstrate how gamification can enhance programming education by combining coding challenges with engaging gameplay elements.
